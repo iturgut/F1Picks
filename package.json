@@ -1,6 +1,6 @@
 {
   "name": "f1-picks",
-  "version": "1.0.0",
+  "version": "0.1.0",
   "description": "F1 prediction game with real-time scoring",
   "private": true,
   "workspaces": [
