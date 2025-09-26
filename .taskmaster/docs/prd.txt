@@ -1,0 +1,126 @@
+Overview
+
+F1 Picks is a free-to-play prediction web app for Formula 1 fans who want to compete socially with friends and groups. Users make predictions before race sessions, which are then automatically scored once official timing and telemetry data becomes available via the FastF1 library. Data availability lags ~30–120 minutes post-session, so scoring is delayed but transparent. This avoids the cost and licensing complexity of the official F1 API while still providing rich stats.
+
+⸻
+
+Core Features
+
+1. Global and League Leaderboards
+	•	What it does: Shows rankings within a global league at MVP, with private leagues later.
+	•	Why it’s important: Encourages competition and social engagement.
+	•	How it works: Scores are aggregated after session results are ingested from FastF1 post-session data.
+
+2. Telemetry-Aware Predictions
+	•	What it does: Lets users predict props such as race winner, podium, fastest lap, sector times, and pit windows.
+	•	Why it’s important: Makes the app unique by leaning on F1’s telemetry.
+	•	How it works: Picks are locked pre-session, then compared against FastF1 data once available.
+
+3. Post-Session Auto-Scoring
+	•	What it does: Automatically scores all picks once FastF1 publishes session data.
+	•	Why it’s important: Delivers transparent results, without needing official F1 live API.
+	•	How it works: A worker polls FastF1 availability, ingests results/telemetry into Postgres, and runs scoring functions. Users see updated scores/leaderboards after ingestion completes.
+
+4. Authentication + Camera
+	•	What it does: Users sign up via Firebase email/password or Google/Apple login. Camera supports profile photos and QR league joining.
+	•	Why it’s important: Low-friction onboarding and social identity.
+	•	How it works: Firebase manages accounts, frontend uses native camera APIs.
+
+5. Geolocation
+	•	What it does: Localizes session start times and surfaces nearest F1 circuit.
+	•	Why it’s important: Personalizes user experience across time zones.
+	•	How it works: Browser geolocation mapped to session UTC times.
+
+6. Analytics + Transparency
+	•	What it does: Displays hit rate, average margin, and per-prop scoring breakdown.
+	•	Why it’s important: Builds trust, keeps users engaged over multiple events.
+	•	How it works: Stats derived from scoring tables, rendered as charts.
+
+⸻
+
+User Experience
+
+Personas
+	•	Social Gamer: Plays with friends for fun.
+	•	F1 Enthusiast: Wants detailed telemetry-based scoring.
+	•	Newcomer: Joins via QR/invite, plays casually.
+
+Key Flows
+	•	Onboarding: Browse events → sign up at first pick → optional camera photo → auto-join global league.
+	•	Making Picks: Select props before session → lock before start time.
+	•	Scoring: Wait until FastF1 data is available → system auto-scores → users see updated leaderboards.
+	•	Profile: Review stats, hit rate, margins.
+
+UX Considerations
+	•	Countdown clocks to lock deadlines.
+	•	Leaderboards update after scoring worker completes.
+	•	Clear “pending scoring” state between session end and data availability.
+
+⸻
+
+Technical Architecture
+
+System Components
+	•	Frontend: Next.js, TypeScript, Tailwind CSS.
+	•	Backend API: FastAPI, Uvicorn, Pydantic.
+	•	Worker: Python + FastF1 to ingest schedules, results, telemetry post-session.
+	•	Database: Postgres (events, picks, results, scores).
+	•	Auth: Firebase (email/password, Google/Apple).
+	•	Hosting: Fly.io backend + workers, Vercel frontend.
+	•	CI/CD: GitHub Actions (lint, type-check, tests, deploy).
+
+Data Models
+
+(Same as before: Users, Leagues, LeagueMembers, Events, Picks, Results, Scores, Audit).
+
+APIs
+	•	GET /events/upcoming
+	•	POST /picks
+	•	GET /leagues/{id}/leaderboard
+	•	GET /users/{id}/profile
+	•	POST /worker/fetch (internal trigger)
+
+⸻
+
+Development Roadmap
+
+MVP Requirements
+	•	Event schedule ingest from FastF1.
+	•	Firebase auth + global league.
+	•	Picks UI with telemetry props.
+	•	Worker to fetch FastF1 results/telemetry post-session.
+	•	Auto-scoring + per-prop breakdown.
+	•	Leaderboard (global).
+	•	Profile + analytics (hit rate, margin).
+	•	Camera (photo + QR).
+	•	Geolocation (local session times).
+
+Future Enhancements
+	•	Private leagues.
+	•	Expanded telemetry props (undercuts, anomaly detection).
+	•	Seasonal leaderboards, playoffs, badges.
+	•	Country leaderboards.
+
+⸻
+
+Logical Dependency Chain
+	1.	Foundation: DB schema, FastF1 ingest worker, CI/CD.
+	2.	Frontend visibility: Event browsing + picks UI.
+	3.	Scoring system: Worker ingests FastF1 data post-session → scoring → leaderboard update.
+	4.	Social layer: Auth, camera, QR join, profile stats.
+	5.	Enhancements: Private leagues, analytics charts, extra props.
+
+⸻
+
+Risks and Mitigations
+	•	FastF1 delay (30–120 min): Clear UI state “scoring pending.”
+	•	Data anomalies: Use audit logs; manual overrides possible.
+	•	User expectation of live updates: Messaging must emphasize post-session scoring.
+	•	Solo dev bandwidth: Keep MVP atomic and expandable.
+
+⸻
+
+Appendix
+	•	FastF1 limits: Telemetry/results only reliable post-2018. Post-session ingestion only.
+	•	Ergast API: Older schedule/results data back to 1950.
+	•	Constraints: Free-to-play only, HTTPS, secure PII.

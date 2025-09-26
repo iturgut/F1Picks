@@ -1,0 +1,756 @@
+{
+  "master": {
+    "tasks": [
+      {
+        "id": "11",
+        "title": "Setup Project Infrastructure and Database Schema",
+        "description": "Initialize the project monorepo, configure CI/CD with GitHub Actions, and implement the database schema for the F1 Picks application.",
+        "details": "1. Create a single monorepo with organized subdirectories for frontend (Next.js) and backend (FastAPI)\n2. Set up GitHub Actions workflows for linting, type-checking, testing, and deployment\n3. Configure deployment to Vercel (frontend) and Fly.io (backend + workers)\n4. Implement Postgres database schema with the following models:\n   - Users: id, email, name, photo_url, created_at\n   - Leagues: id, name, description, is_global, created_at\n   - LeagueMembers: user_id, league_id, joined_at\n   - Events: id, name, circuit_id, start_time, end_time, type (race/qualifying/practice), status\n   - Picks: id, user_id, event_id, prop_type, prop_value, created_at\n   - Results: id, event_id, prop_type, actual_value, source, ingested_at\n   - Scores: id, pick_id, points, margin, created_at\n   - Audit: id, entity_type, entity_id, action, metadata, created_at\n5. Set up database migrations using Alembic\n6. Configure connection pooling and environment variables",
+        "testStrategy": "1. Verify CI/CD pipeline runs successfully on pull requests\n2. Test database migrations up and down\n3. Validate schema constraints and relationships\n4. Ensure proper indexing for query performance\n5. Write unit tests for database models and their relationships",
+        "priority": "high",
+        "dependencies": [],
+        "status": "in-progress",
+        "subtasks": [
+          {
+            "id": 1,
+            "title": "Create and Configure Project Monorepo",
+            "description": "Set up a single monorepo with organized subdirectories for frontend (Next.js) and backend (FastAPI) with unified project structure and configuration files.",
+            "dependencies": [],
+            "details": "1. Create a single GitHub repository with a monorepo structure\n2. Set up the following directory structure:\n   - /frontend (Next.js with TypeScript)\n   - /backend (FastAPI with Python 3.9+)\n   - /shared (for shared utilities, types, and configurations)\n3. Initialize Next.js project with TypeScript in the frontend directory\n4. Set up FastAPI project with Python 3.9+ in the backend directory\n5. Configure root-level ESLint, Prettier, and TypeScript for the entire project\n6. Set up Black, isort, and mypy for the backend directory\n7. Create a comprehensive README file at the root with project overview, architecture explanation, and setup instructions\n8. Configure a unified .gitignore file at the root level with appropriate rules for both frontend and backend\n9. Set up package.json at the root with workspace configuration and common development scripts\n10. Create requirements.txt and dev-requirements.txt in the backend directory\n11. Implement a unified build and development setup with scripts that can run both services\n12. Configure workspace-specific settings for VS Code or other IDEs",
+            "status": "pending",
+            "testStrategy": "1. Verify project initialization scripts run without errors\n2. Test linting configurations work correctly\n3. Ensure development servers can be started\n4. Validate TypeScript configuration",
+            "parentId": "undefined"
+          },
+          {
+            "id": 2,
+            "title": "Implement CI/CD Pipelines with GitHub Actions",
+            "description": "Configure GitHub Actions workflows for linting, testing, and deployment for the monorepo containing both frontend and backend.",
+            "dependencies": [
+              "11.1"
+            ],
+            "details": "1. Create .github/workflows directory in the monorepo root\n2. Implement unified CI workflow with:\n   - Node.js setup for frontend\n   - Python setup for backend\n   - Dependency installation for both services\n   - Linting with ESLint (frontend) and Black/isort (backend)\n   - Type checking with TypeScript and mypy\n   - Unit tests with Jest (frontend) and pytest (backend)\n   - Build verification for both services\n3. Configure Vercel deployment for frontend subdirectory\n4. Set up Fly.io deployment for backend subdirectory\n5. Add deployment workflows triggered on main branch merges\n6. Configure environment secrets for deployments\n7. Implement path-based workflow triggers for efficient CI",
+            "status": "pending",
+            "testStrategy": "1. Test workflows by making pull requests\n2. Verify all CI checks run successfully\n3. Test deployment to staging environments\n4. Validate secret management and environment variables",
+            "parentId": "undefined"
+          },
+          {
+            "id": 3,
+            "title": "Design and Implement Database Schema",
+            "description": "Create the Postgres database schema with all required tables, relationships, constraints, and indexes for the F1 Picks application.",
+            "dependencies": [
+              "11.1"
+            ],
+            "details": "1. Set up PostgreSQL database locally for development\n2. Create SQL schema definition with the following tables:\n   - Users (id, email, name, photo_url, created_at)\n   - Leagues (id, name, description, is_global, created_at)\n   - LeagueMembers (user_id, league_id, joined_at)\n   - Events (id, name, circuit_id, start_time, end_time, type, status)\n   - Picks (id, user_id, event_id, prop_type, prop_value, created_at)\n   - Results (id, event_id, prop_type, actual_value, source, ingested_at)\n   - Scores (id, pick_id, points, margin, created_at)\n   - Audit (id, entity_type, entity_id, action, metadata, created_at)\n3. Define primary keys, foreign keys, and constraints\n4. Create appropriate indexes for query performance\n5. Add timestamp fields for created_at/updated_at\n6. Implement soft delete where appropriate\n7. Define enum types for status fields",
+            "status": "pending",
+            "testStrategy": "1. Validate schema with test data insertion\n2. Test foreign key constraints\n3. Verify indexes improve query performance\n4. Test unique constraints and validation rules\n5. Ensure timestamp fields update correctly",
+            "parentId": "undefined"
+          },
+          {
+            "id": 4,
+            "title": "Configure Database Migrations with Alembic",
+            "description": "Set up Alembic for database migrations and create the initial migration script for the schema.",
+            "dependencies": [
+              "11.3"
+            ],
+            "details": "1. Install Alembic in the backend project\n2. Initialize Alembic with `alembic init migrations`\n3. Configure Alembic to use SQLAlchemy models\n4. Create database URL configuration with environment variables\n5. Implement SQLAlchemy models matching the database schema\n6. Generate initial migration script with `alembic revision --autogenerate`\n7. Test migration up and down\n8. Create seed data migration for development\n9. Document migration commands in README\n10. Add migration commands to CI/CD pipeline",
+            "status": "pending",
+            "testStrategy": "1. Test migrations on clean database\n2. Verify rollback functionality works correctly\n3. Test migrations with existing data\n4. Validate seed data is correctly inserted\n5. Ensure migrations run in CI pipeline",
+            "parentId": "undefined"
+          },
+          {
+            "id": 5,
+            "title": "Implement Database Connection and Environment Configuration",
+            "description": "Set up database connection pooling, environment variable management, and database access layer for the application.",
+            "dependencies": [
+              "11.4"
+            ],
+            "details": "1. Implement connection pooling with SQLAlchemy\n2. Create environment variable configuration with pydantic settings\n3. Set up .env files for local development\n4. Implement database session management\n5. Create base repository pattern for database access\n6. Implement CRUD operations for each model\n7. Add database health check endpoint\n8. Configure connection timeouts and retry logic\n9. Implement database transaction management\n10. Add logging for database operations\n11. Set up database connection for tests with test database",
+            "status": "pending",
+            "testStrategy": "1. Test connection pooling under load\n2. Verify environment variables are correctly loaded\n3. Test database session management\n4. Validate CRUD operations for each model\n5. Test health check endpoint\n6. Verify connection retry logic works",
+            "parentId": "undefined"
+          }
+        ],
+        "updatedAt": "2025-09-26T03:37:12.923Z"
+      },
+      {
+        "id": "12",
+        "title": "Implement FastF1 Integration Worker",
+        "description": "Create a Python worker service that polls and ingests Formula 1 event schedules, results, and telemetry data from the FastF1 library.",
+        "details": "1. Set up a Python service with FastF1 dependency\n2. Implement functions to fetch and parse:\n   - Season calendar and event schedule\n   - Race results (finishing positions, fastest laps)\n   - Qualifying results (positions, sector times)\n   - Telemetry data (lap times, pit stops, sector breakdowns)\n3. Create data transformation functions to normalize FastF1 data into our database schema\n4. Implement polling mechanism to check for data availability post-session (30-120 min delay)\n5. Add error handling for data anomalies and FastF1 API changes\n6. Set up logging and monitoring for worker processes\n7. Create database ingestion functions to store fetched data\n8. Implement idempotent operations to handle retries safely\n\nExample worker polling pseudocode:\n```python\ndef poll_for_session_data(event_id):\n    event = get_event(event_id)\n    if event.end_time + timedelta(minutes=30) > datetime.now():\n        # Too early to check, session ended less than 30 min ago\n        return False\n        \n    try:\n        session_data = fastf1.get_session(event.year, event.round, event.session_type)\n        session_data.load()\n        if session_data.results is not None:\n            # Data is available, ingest it\n            ingest_results(event_id, session_data)\n            trigger_scoring(event_id)\n            return True\n    except DataNotAvailableError:\n        # FastF1 data not yet available\n        pass\n    return False\n```",
+        "testStrategy": "1. Create mock FastF1 data for testing without actual API calls\n2. Test data transformation functions with sample FastF1 outputs\n3. Verify correct handling of various session types (race, qualifying, practice)\n4. Test polling retry logic and backoff strategy\n5. Validate error handling for missing or malformed data\n6. Ensure idempotent database operations\n7. Test end-to-end flow with sample data",
+        "priority": "high",
+        "dependencies": [
+          "11"
+        ],
+        "status": "pending",
+        "subtasks": [
+          {
+            "id": 1,
+            "title": "Set up Python service with FastF1 integration",
+            "description": "Create the base Python service structure with FastF1 dependency and configure the environment for the worker service.",
+            "dependencies": [],
+            "details": "1. Create a new Python project with appropriate directory structure\n2. Set up virtual environment and dependency management (poetry/pipenv)\n3. Add FastF1 and other required dependencies (pandas, requests, database drivers)\n4. Create configuration module for environment variables\n5. Implement basic logging setup with structured logging\n6. Create service entry point with initialization logic\n7. Add Docker configuration for containerization",
+            "status": "pending",
+            "testStrategy": "1. Verify FastF1 can be imported and initialized\n2. Test configuration loading from environment variables\n3. Validate logging setup captures appropriate information",
+            "parentId": "undefined"
+          },
+          {
+            "id": 2,
+            "title": "Implement data fetching and parsing functions",
+            "description": "Create functions to fetch and parse Formula 1 data from FastF1 library, including season calendar, race results, qualifying results, and telemetry data.",
+            "dependencies": [
+              "12.1"
+            ],
+            "details": "1. Implement function to fetch season calendar and event schedule\n2. Create function to get race results with finishing positions and fastest laps\n3. Implement qualifying results fetcher with positions and sector times\n4. Create telemetry data fetcher for lap times, pit stops, and sector breakdowns\n5. Add retry logic for API calls with exponential backoff\n6. Implement caching mechanism to avoid redundant API calls\n7. Create utility functions for handling different session types (race, qualifying, practice)",
+            "status": "pending",
+            "testStrategy": "1. Create mock FastF1 data for testing without actual API calls\n2. Test each fetcher function with sample data\n3. Verify correct handling of various session types\n4. Test retry logic with simulated failures",
+            "parentId": "undefined"
+          },
+          {
+            "id": 3,
+            "title": "Create data transformation and normalization functions",
+            "description": "Develop functions to transform and normalize the FastF1 data into the format required by the application's database schema.",
+            "dependencies": [
+              "12.2"
+            ],
+            "details": "1. Create data models that match database schema\n2. Implement transformation functions for each data type (calendar, results, telemetry)\n3. Add data validation to ensure integrity before database insertion\n4. Create normalization functions to handle inconsistent data formats\n5. Implement special case handling for DNFs, disqualifications, and penalties\n6. Add functions to extract and format timing data consistently\n7. Create utility functions for driver and team name normalization",
+            "status": "pending",
+            "testStrategy": "1. Test transformation functions with various FastF1 data samples\n2. Verify correct handling of edge cases (DNF, DSQ)\n3. Test data validation with both valid and invalid inputs\n4. Validate output matches expected database schema",
+            "parentId": "undefined"
+          },
+          {
+            "id": 4,
+            "title": "Implement polling mechanism and scheduler",
+            "description": "Create a polling mechanism that checks for data availability after sessions with appropriate delays and scheduling logic.",
+            "dependencies": [
+              "12.2",
+              "12.3"
+            ],
+            "details": "1. Implement the poll_for_session_data function as shown in the pseudocode\n2. Create a scheduler that manages polling frequency based on session times\n3. Implement backoff strategy for repeated polling attempts\n4. Add logic to detect when a session has concluded\n5. Create mechanism to track polling attempts and prevent infinite retries\n6. Implement session-specific delay logic (30-120 min based on session type)\n7. Add state persistence to handle service restarts during polling",
+            "status": "pending",
+            "testStrategy": "1. Test polling logic with mock session data\n2. Verify correct backoff behavior with unavailable data\n3. Test scheduler with various session scenarios\n4. Validate state persistence across simulated restarts",
+            "parentId": "undefined"
+          },
+          {
+            "id": 5,
+            "title": "Implement database ingestion and error handling",
+            "description": "Create database ingestion functions to store fetched data and implement comprehensive error handling for data anomalies and API changes.",
+            "dependencies": [
+              "12.3",
+              "12.4"
+            ],
+            "details": "1. Implement database connection and ORM setup\n2. Create idempotent database ingestion functions for each data type\n3. Add transaction management to ensure data consistency\n4. Implement error handling for FastF1 API changes or anomalies\n5. Create data validation checks before database insertion\n6. Add monitoring hooks for tracking ingestion success/failure\n7. Implement cleanup logic for temporary data\n8. Create trigger function to initiate scoring after successful ingestion",
+            "status": "pending",
+            "testStrategy": "1. Test database ingestion with mock data\n2. Verify idempotent operations handle retries correctly\n3. Test error handling with simulated API failures\n4. Validate transaction rollback on partial failures\n5. Test monitoring hooks capture appropriate metrics",
+            "parentId": "undefined"
+          }
+        ]
+      },
+      {
+        "id": "13",
+        "title": "Implement Authentication System with Firebase",
+        "description": "Set up Firebase authentication for email/password and social logins (Google/Apple), and integrate it with the frontend and backend systems.",
+        "details": "1. Create Firebase project and configure authentication methods:\n   - Email/password\n   - Google OAuth\n   - Apple Sign In\n2. Implement frontend authentication components:\n   - Login form\n   - Registration form\n   - Social login buttons\n   - Password reset flow\n3. Set up Firebase SDK in Next.js frontend:\n   - Initialize Firebase app\n   - Create auth context provider\n   - Implement protected routes\n4. Create backend authentication middleware:\n   - Verify Firebase JWT tokens\n   - Extract user information\n   - Handle authorization\n5. Implement user profile creation on first login\n6. Auto-join users to global league upon registration\n7. Set up session management and token refresh\n\nExample Firebase auth integration in Next.js:\n```typescript\n// auth-context.tsx\nimport { createContext, useContext, useEffect, useState } from 'react';\nimport { getAuth, onAuthStateChanged, signInWithEmailAndPassword } from 'firebase/auth';\nimport { app } from '../firebase-config';\n\nconst AuthContext = createContext<{user: User | null, loading: boolean}>({ user: null, loading: true });\n\nexport function AuthProvider({ children }) {\n  const [user, setUser] = useState<User | null>(null);\n  const [loading, setLoading] = useState(true);\n  \n  useEffect(() => {\n    const auth = getAuth(app);\n    const unsubscribe = onAuthStateChanged(auth, (user) => {\n      setUser(user);\n      setLoading(false);\n    });\n    return unsubscribe;\n  }, []);\n  \n  return (\n    <AuthContext.Provider value={{ user, loading }}>\n      {children}\n    </AuthContext.Provider>\n  );\n}\n```",
+        "testStrategy": "1. Test user registration flow with email/password\n2. Test social login flows with Google and Apple\n3. Verify token validation on backend API calls\n4. Test authentication error handling and user feedback\n5. Verify automatic global league joining\n6. Test session persistence and token refresh\n7. Validate protected routes redirect unauthenticated users\n8. Test password reset flow",
+        "priority": "high",
+        "dependencies": [
+          "11"
+        ],
+        "status": "pending",
+        "subtasks": [
+          {
+            "id": 1,
+            "title": "Create and Configure Firebase Project",
+            "description": "Set up a new Firebase project and configure the authentication methods including email/password, Google OAuth, and Apple Sign In.",
+            "dependencies": [],
+            "details": "1. Create a new Firebase project in the Firebase console\n2. Enable Authentication service in the Firebase project\n3. Configure Email/Password authentication method in Firebase console\n4. Set up Google OAuth provider with appropriate credentials\n5. Configure Apple Sign In with required certificates and keys\n6. Set up security rules for authentication\n7. Note down Firebase configuration details (apiKey, authDomain, etc.) for frontend integration",
+            "status": "pending",
+            "testStrategy": "Verify all authentication methods are properly enabled in Firebase console. Test each auth method manually through Firebase Authentication UI to ensure proper configuration.",
+            "parentId": "undefined"
+          },
+          {
+            "id": 2,
+            "title": "Implement Firebase SDK Integration in Next.js Frontend",
+            "description": "Set up Firebase SDK in the Next.js application, create authentication context provider, and implement authentication state management.",
+            "dependencies": [
+              "13.1"
+            ],
+            "details": "1. Install Firebase SDK packages: `npm install firebase firebase/auth`\n2. Create firebase-config.ts file with initialization code using the Firebase project details\n3. Implement AuthContext provider component that manages authentication state\n4. Create custom hooks for auth operations (useAuth, useSignIn, useSignOut, etc.)\n5. Set up auth state listener using onAuthStateChanged\n6. Implement token persistence and refresh logic\n7. Add protected route wrapper component that redirects unauthenticated users",
+            "status": "pending",
+            "testStrategy": "Unit test the auth context provider and hooks. Test authentication state persistence across page refreshes. Verify protected routes correctly redirect unauthenticated users.",
+            "parentId": "undefined"
+          },
+          {
+            "id": 3,
+            "title": "Build Authentication UI Components",
+            "description": "Create frontend components for user authentication including login form, registration form, social login buttons, and password reset flow.",
+            "dependencies": [
+              "13.2"
+            ],
+            "details": "1. Create LoginForm component with email/password fields and validation\n2. Implement RegistrationForm component with necessary user information fields\n3. Build SocialLoginButtons component for Google and Apple login options\n4. Create PasswordResetForm component for the forgot password flow\n5. Implement form validation using a form library (e.g., Formik, React Hook Form)\n6. Add error handling and user feedback for authentication actions\n7. Style components according to application design system\n8. Implement responsive design for mobile and desktop views",
+            "status": "pending",
+            "testStrategy": "Test form validation for all input fields. Verify error messages display correctly for invalid inputs. Test social login button functionality. Ensure responsive design works across different screen sizes.",
+            "parentId": "undefined"
+          },
+          {
+            "id": 4,
+            "title": "Implement Backend Authentication Middleware",
+            "description": "Create backend middleware to verify Firebase JWT tokens, extract user information, and handle authorization for protected API routes.",
+            "dependencies": [
+              "13.1"
+            ],
+            "details": "1. Install Firebase Admin SDK in the backend service\n2. Initialize Firebase Admin with service account credentials\n3. Create authentication middleware that verifies Firebase JWT tokens\n4. Implement token extraction from request headers\n5. Add user information extraction from verified tokens\n6. Create role-based authorization middleware if needed\n7. Handle token verification errors with appropriate HTTP responses\n8. Add the middleware to protected API routes",
+            "status": "pending",
+            "testStrategy": "Test middleware with valid and invalid tokens. Verify correct user information extraction from tokens. Test authorization logic with different user roles. Ensure proper error responses for authentication failures.",
+            "parentId": "undefined"
+          },
+          {
+            "id": 5,
+            "title": "Implement User Profile and Post-Authentication Workflows",
+            "description": "Create user profile on first login, auto-join users to global league, and implement session management with token refresh.",
+            "dependencies": [
+              "13.2",
+              "13.4"
+            ],
+            "details": "1. Create database schema for user profiles\n2. Implement API endpoint to create/update user profiles\n3. Add logic to detect first-time logins and trigger profile creation\n4. Implement auto-join functionality for the global league\n5. Create session management utilities for handling token expiration\n6. Implement token refresh logic to maintain user sessions\n7. Add user profile completion check after authentication\n8. Create API endpoints for user profile management",
+            "status": "pending",
+            "testStrategy": "Test user profile creation on first login. Verify users are automatically added to global league. Test session persistence and token refresh functionality. Verify user profile updates are saved correctly.",
+            "parentId": "undefined"
+          }
+        ]
+      },
+      {
+        "id": "14",
+        "title": "Develop Event Browsing and Picks UI",
+        "description": "Create the frontend interface for browsing upcoming F1 events and making predictions before sessions begin.",
+        "details": "1. Implement event listing page with:\n   - Upcoming events sorted by date\n   - Event details (circuit, session type, start time)\n   - Countdown timers to session start\n   - Local time display based on user's timezone\n2. Create prediction form UI with:\n   - Race winner selection\n   - Podium prediction\n   - Fastest lap prediction\n   - Sector time predictions\n   - Pit window predictions\n3. Implement pick submission and locking:\n   - Form validation\n   - Submission to backend API\n   - Locking mechanism before session start\n   - Visual indication of locked picks\n4. Add session status indicators:\n   - Upcoming (predictions open)\n   - Live (predictions locked)\n   - Completed (awaiting scoring)\n   - Scored (results available)\n5. Implement responsive design for mobile and desktop\n\nExample event card component:\n```tsx\nconst EventCard = ({ event }) => {\n  const { startTime, endTime, name, circuit, type, status } = event;\n  const localStartTime = formatToLocalTime(startTime);\n  const timeUntilStart = calculateTimeUntil(startTime);\n  const isPredictionLocked = new Date() > new Date(startTime);\n  \n  return (\n    <div className=\"rounded-lg shadow p-4 bg-white\">\n      <h3 className=\"font-bold text-lg\">{name}</h3>\n      <p className=\"text-gray-600\">{circuit.name}</p>\n      <div className=\"flex justify-between items-center mt-2\">\n        <span className=\"text-sm\">{localStartTime}</span>\n        <StatusBadge status={status} />\n      </div>\n      {status === 'upcoming' && (\n        <div className=\"mt-3\">\n          <span className=\"text-sm font-medium\">Locks in: {timeUntilStart}</span>\n          <Button \n            disabled={isPredictionLocked}\n            onClick={() => router.push(`/events/${event.id}/predict`)}\n          >\n            {isPredictionLocked ? 'Locked' : 'Make Predictions'}\n          </Button>\n        </div>\n      )}\n    </div>\n  );\n};\n```",
+        "testStrategy": "1. Test event listing with mock data for various states\n2. Verify countdown timer accuracy and updates\n3. Test form validation for all prediction types\n4. Verify pick submission and error handling\n5. Test locking mechanism based on session start time\n6. Verify responsive design on different screen sizes\n7. Test timezone conversion for event times\n8. Validate accessibility compliance",
+        "priority": "high",
+        "dependencies": [
+          "11",
+          "13"
+        ],
+        "status": "pending",
+        "subtasks": [
+          {
+            "id": 1,
+            "title": "Implement Event Listing Page with Countdown Timers",
+            "description": "Create the main event browsing page that displays upcoming F1 events in chronological order with countdown timers and local time conversion.",
+            "dependencies": [],
+            "details": "Create a responsive grid layout for event cards. Implement the EventCard component shown in the example, ensuring it displays circuit details, session type, and start time. Add a utility function to convert UTC times to the user's local timezone. Implement a live-updating countdown timer component that shows time remaining until session start. Add sorting functionality to display events in chronological order. Include status indicators (upcoming, live, completed, scored) with appropriate styling. Ensure the page fetches event data from the backend API.",
+            "status": "pending",
+            "testStrategy": "Test rendering with mock data for various event states. Verify countdown timer updates correctly. Test timezone conversion accuracy across different user locations. Verify responsive layout on mobile, tablet, and desktop viewports.",
+            "parentId": "undefined"
+          },
+          {
+            "id": 2,
+            "title": "Develop Prediction Form Components",
+            "description": "Create reusable form components for different types of predictions including race winner, podium positions, fastest lap, sector times, and pit windows.",
+            "dependencies": [
+              "14.1"
+            ],
+            "details": "Implement form components for each prediction type: DriverSelector for race winner and podium positions (using dropdown or grid of driver cards), TimePredictor for lap and sector time predictions (with appropriate input validation for time format), and PitWindowPredictor for pit stop predictions. Create a FormSection component to group related predictions. Add tooltips explaining prediction rules. Ensure all components support both creation and viewing modes. Style components according to the application's design system. Implement client-side validation for each input type.",
+            "status": "pending",
+            "testStrategy": "Test form components with various input scenarios. Verify validation logic prevents invalid submissions. Test keyboard accessibility. Ensure components render correctly in both creation and viewing modes.",
+            "parentId": "undefined"
+          },
+          {
+            "id": 3,
+            "title": "Create Complete Prediction Submission Flow",
+            "description": "Implement the full prediction submission workflow including form validation, API submission, error handling, and success confirmation.",
+            "dependencies": [
+              "14.2"
+            ],
+            "details": "Create a PredictionForm container component that combines all prediction components. Implement form state management using React hooks or a form library. Add comprehensive validation to ensure all required fields are completed correctly before submission. Create submission handler that sends prediction data to the backend API. Implement error handling for API failures with user-friendly error messages. Add loading states during submission. Implement success confirmation with appropriate messaging. Create a review screen allowing users to confirm their picks before final submission.",
+            "status": "pending",
+            "testStrategy": "Test the complete form submission flow. Verify all validation rules are enforced. Test API integration with mock endpoints. Verify error states display appropriate messages. Test the review and confirmation process.",
+            "parentId": "undefined"
+          },
+          {
+            "id": 4,
+            "title": "Implement Prediction Locking Mechanism",
+            "description": "Create the system that locks predictions when a session starts and provides visual indication of locked status across the UI.",
+            "dependencies": [
+              "14.3"
+            ],
+            "details": "Implement a time-based locking mechanism that compares current time with session start time. Create a LockStatus component that visually indicates whether predictions are still open or locked. Add disabled states to all form inputs when predictions are locked. Implement server-side validation to prevent late submissions even if client-side checks are bypassed. Create a visual overlay for locked prediction cards showing the user's submitted predictions. Add a countdown component specifically for time remaining to make predictions. Ensure all time comparisons use consistent timezone handling.",
+            "status": "pending",
+            "testStrategy": "Test locking mechanism with various time scenarios. Verify UI correctly reflects locked state. Test server-side validation prevents late submissions. Verify the locked overlay displays correctly with submitted prediction data.",
+            "parentId": "undefined"
+          },
+          {
+            "id": 5,
+            "title": "Develop Responsive Layout and Navigation",
+            "description": "Ensure the entire event browsing and prediction UI is fully responsive and implement navigation between events, prediction forms, and results pages.",
+            "dependencies": [
+              "14.1",
+              "14.2",
+              "14.3",
+              "14.4"
+            ],
+            "details": "Implement responsive layouts for all pages using CSS Grid and Flexbox. Create a navigation system between the event listing, prediction form, and results pages. Add breadcrumb navigation to help users understand their location. Implement filters for the event listing page (upcoming, live, completed, scored). Create mobile-optimized versions of all components with appropriate touch targets. Add swipe gestures for mobile navigation between related screens. Ensure all interactive elements have appropriate hover, focus, and active states. Implement skeleton loading states for improved perceived performance.",
+            "status": "pending",
+            "testStrategy": "Test responsive behavior across different device sizes. Verify navigation flows work correctly. Test filter functionality for event listings. Verify touch interactions on mobile devices. Test keyboard navigation for accessibility. Verify loading states display appropriately during data fetching.",
+            "parentId": "undefined"
+          }
+        ]
+      },
+      {
+        "id": "15",
+        "title": "Implement Scoring System and Algorithms",
+        "description": "Develop the backend scoring system that compares user predictions against actual FastF1 data and calculates points based on accuracy.",
+        "details": "1. Design scoring algorithms for different prediction types:\n   - Exact match (race winner, podium positions): 10 points\n   - Near match (position off by 1-3): 5-1 points\n   - Time-based predictions (lap times, sector times): points based on % accuracy\n   - Pit window predictions: points based on lap accuracy\n2. Implement scoring functions for each prediction type\n3. Create a scoring worker that:\n   - Triggers after FastF1 data is ingested\n   - Retrieves all picks for the completed event\n   - Compares picks against actual results\n   - Calculates points and margin of error\n   - Updates score records in database\n   - Updates leaderboards\n4. Add audit logging for scoring operations\n5. Implement manual override capability for admin users\n\nExample scoring function pseudocode:\n```python\ndef score_race_winner_pick(pick, results):\n    actual_winner = results.get_winner()\n    predicted_winner = pick.prop_value\n    \n    if predicted_winner == actual_winner:\n        return {\n            'points': 10,\n            'margin': 0,\n            'exact_match': True\n        }\n    \n    # Get finishing position of predicted driver\n    predicted_position = results.get_position(predicted_winner)\n    if predicted_position is None:  # DNF\n        return {\n            'points': 0,\n            'margin': 20,  # Max penalty\n            'exact_match': False\n        }\n    \n    # Points decrease based on how far off prediction was\n    position_diff = predicted_position - 1  # Winner is position 1\n    points = max(0, 10 - (position_diff * 2))\n    \n    return {\n        'points': points,\n        'margin': position_diff,\n        'exact_match': False\n    }\n```",
+        "testStrategy": "1. Unit test each scoring algorithm with various scenarios\n2. Test edge cases (DNF, disqualifications, ties)\n3. Verify correct point calculation for all prediction types\n4. Test end-to-end scoring process with mock FastF1 data\n5. Validate leaderboard updates after scoring\n6. Test audit logging for scoring operations\n7. Verify manual override functionality\n8. Test handling of data anomalies and missing results",
+        "priority": "high",
+        "dependencies": [
+          "11",
+          "12"
+        ],
+        "status": "pending",
+        "subtasks": [
+          {
+            "id": 1,
+            "title": "Design and implement core scoring algorithms",
+            "description": "Create the fundamental scoring functions for different prediction types that will calculate points based on the accuracy of user predictions compared to actual results.",
+            "dependencies": [],
+            "details": "Implement separate scoring functions for each prediction type: (1) exact match predictions (race winner, podium positions), (2) near match predictions with position differences, (3) time-based predictions (lap times, sector times) using percentage accuracy, and (4) pit window predictions based on lap accuracy. Each function should take a user prediction and actual result as input and return a structured object containing points awarded, margin of error, and whether it was an exact match. Include edge case handling for DNFs, disqualifications, and ties.",
+            "status": "pending",
+            "testStrategy": "Write unit tests for each scoring algorithm with various scenarios including perfect predictions, near misses, and complete misses. Test edge cases like DNFs, disqualifications, and ties to ensure robust handling. Create a test suite that validates the scoring logic against known expected outcomes.",
+            "parentId": "undefined"
+          },
+          {
+            "id": 2,
+            "title": "Create database models for scoring records",
+            "description": "Design and implement the database models needed to store scoring results, including user scores, prediction accuracy, and historical performance data.",
+            "dependencies": [
+              "15.1"
+            ],
+            "details": "Create database models for: (1) UserScore to track total points per user per event, (2) PredictionScore to store individual prediction results with points and accuracy metrics, (3) LeaderboardEntry to maintain current standings, and (4) ScoringAudit to log all scoring operations. Include fields for points, margin of error, timestamp, and references to related entities (user, event, prediction). Implement database migrations to add these new tables and any necessary indexes for query performance.",
+            "status": "pending",
+            "testStrategy": "Test database models with mock data to verify relationships and constraints. Ensure proper cascading behavior when related records are deleted. Validate that indexes support efficient querying patterns for leaderboard generation and user score history.",
+            "parentId": "undefined"
+          },
+          {
+            "id": 3,
+            "title": "Implement scoring worker service",
+            "description": "Develop a background worker service that processes predictions after FastF1 data is ingested, applies scoring algorithms, and updates the database with results.",
+            "dependencies": [
+              "15.1",
+              "15.2"
+            ],
+            "details": "Create a worker service that: (1) listens for events indicating new FastF1 data is available, (2) retrieves all user predictions for the completed event, (3) fetches actual results from the FastF1 data store, (4) applies appropriate scoring algorithms to each prediction, (5) calculates total scores per user, (6) persists all scoring data to the database, and (7) triggers leaderboard updates. Implement retry logic for failed scoring attempts and ensure idempotent processing to prevent duplicate scoring.",
+            "status": "pending",
+            "testStrategy": "Test the worker with mock FastF1 data and user predictions. Verify correct end-to-end processing from data ingestion trigger to database updates. Test recovery from failures at various stages of the process. Validate that all prediction types are correctly scored and aggregated.",
+            "parentId": "undefined"
+          },
+          {
+            "id": 4,
+            "title": "Implement leaderboard generation and caching",
+            "description": "Create the system for generating and updating leaderboards based on user scores, with efficient caching to support high-traffic periods.",
+            "dependencies": [
+              "15.3"
+            ],
+            "details": "Implement leaderboard functionality that: (1) calculates global and per-event rankings based on total points, (2) supports filtering by league, event type, or time period, (3) includes tie-breaking logic using secondary metrics like prediction accuracy, (4) caches leaderboard results with appropriate invalidation triggers, and (5) provides paginated API endpoints for frontend consumption. Use a background process to pre-calculate common leaderboard views to reduce on-demand computation.",
+            "status": "pending",
+            "testStrategy": "Test leaderboard generation with various scoring scenarios including ties. Verify cache invalidation works correctly when new scores are added. Load test the leaderboard API endpoints to ensure they can handle peak traffic. Validate that pagination and filtering work as expected.",
+            "parentId": "undefined"
+          },
+          {
+            "id": 5,
+            "title": "Implement admin override and audit logging",
+            "description": "Create an administrative interface for manually adjusting scores when necessary, with comprehensive audit logging for all scoring operations.",
+            "dependencies": [
+              "15.2",
+              "15.3"
+            ],
+            "details": "Develop an admin interface that allows authorized users to: (1) view all scoring records for a given event, (2) manually override calculated scores with justification, (3) recalculate scores for specific predictions or entire events, and (4) view the complete audit history of scoring changes. Implement detailed audit logging that captures the original score, changed score, user making the change, timestamp, and justification. Ensure all scoring operations, both automated and manual, are properly logged for accountability.",
+            "status": "pending",
+            "testStrategy": "Test the admin override functionality with various permission levels to ensure only authorized users can make changes. Verify that all manual changes are properly recorded in the audit log with complete details. Test the recalculation functionality to ensure it correctly updates all dependent records.",
+            "parentId": "undefined"
+          }
+        ]
+      },
+      {
+        "id": "16",
+        "title": "Create Leaderboard and User Profile Pages",
+        "description": "Implement the global leaderboard and user profile pages showing rankings, statistics, and prediction history.",
+        "details": "1. Create global leaderboard UI:\n   - Ranked list of users by total points\n   - User profile photos and names\n   - Point totals and recent performance\n   - Pagination for large leaderboards\n   - Filters for time periods (current race, season, all-time)\n2. Implement user profile page:\n   - User details and photo\n   - Overall statistics (total points, rank, events participated)\n   - Performance metrics (hit rate, average margin)\n   - Prediction history with results\n   - Per-prop type breakdown of accuracy\n3. Add API endpoints:\n   - GET /leagues/{id}/leaderboard\n   - GET /users/{id}/profile\n   - GET /users/{id}/predictions\n   - GET /users/{id}/statistics\n4. Implement data visualization for performance metrics\n5. Add social sharing functionality\n\nExample leaderboard component:\n```tsx\nconst Leaderboard = ({ leagueId }) => {\n  const [timeFrame, setTimeFrame] = useState('current');\n  const [page, setPage] = useState(1);\n  const { data, isLoading, error } = useQuery(\n    ['leaderboard', leagueId, timeFrame, page],\n    () => fetchLeaderboard(leagueId, timeFrame, page)\n  );\n  \n  if (isLoading) return <LoadingSpinner />;\n  if (error) return <ErrorMessage error={error} />;\n  \n  return (\n    <div className=\"bg-white rounded-lg shadow p-4\">\n      <div className=\"flex justify-between items-center mb-4\">\n        <h2 className=\"text-xl font-bold\">Leaderboard</h2>\n        <TimeFrameSelector \n          value={timeFrame} \n          onChange={setTimeFrame} \n        />\n      </div>\n      \n      <table className=\"w-full\">\n        <thead>\n          <tr className=\"border-b\">\n            <th className=\"text-left py-2\">Rank</th>\n            <th className=\"text-left py-2\">User</th>\n            <th className=\"text-right py-2\">Points</th>\n            <th className=\"text-right py-2\">Accuracy</th>\n          </tr>\n        </thead>\n        <tbody>\n          {data.rankings.map((user, index) => (\n            <tr key={user.id} className=\"border-b hover:bg-gray-50\">\n              <td className=\"py-3\">{index + 1}</td>\n              <td className=\"py-3\">\n                <div className=\"flex items-center\">\n                  <UserAvatar user={user} size=\"sm\" />\n                  <span className=\"ml-2\">{user.name}</span>\n                </div>\n              </td>\n              <td className=\"py-3 text-right font-medium\">{user.points}</td>\n              <td className=\"py-3 text-right\">{user.accuracy}%</td>\n            </tr>\n          ))}\n        </tbody>\n      </table>\n      \n      <Pagination \n        currentPage={page} \n        totalPages={data.totalPages} \n        onPageChange={setPage} \n      />\n    </div>\n  );\n};\n```",
+        "testStrategy": "1. Test leaderboard rendering with mock data\n2. Verify correct sorting and ranking\n3. Test pagination functionality\n4. Verify profile page displays correct user statistics\n5. Test time frame filtering\n6. Validate data visualization accuracy\n7. Test API endpoints with various parameters\n8. Verify responsive design on different screen sizes\n9. Test social sharing functionality",
+        "priority": "medium",
+        "dependencies": [
+          "13",
+          "15"
+        ],
+        "status": "pending",
+        "subtasks": [
+          {
+            "id": 1,
+            "title": "Implement API Endpoints for Leaderboard and User Profile",
+            "description": "Create backend API endpoints to fetch leaderboard data, user profiles, prediction history, and statistics.",
+            "dependencies": [],
+            "details": "Implement the following RESTful API endpoints:\n1. GET /leagues/{id}/leaderboard?timeFrame={current|season|all-time}&page={pageNumber}&pageSize={pageSize} - Returns ranked list of users with points and performance metrics\n2. GET /users/{id}/profile - Returns user details including photo, name, and basic info\n3. GET /users/{id}/predictions?status={pending|completed|all} - Returns paginated prediction history\n4. GET /users/{id}/statistics - Returns performance metrics including hit rate, average margin, and prop type breakdown\n\nEnsure proper error handling, input validation, and pagination support. Implement sorting by points and filtering by time periods.",
+            "status": "pending",
+            "testStrategy": "Test API endpoints with various parameters and edge cases. Verify correct data is returned for different time frames. Test pagination functionality. Verify error handling for invalid inputs and non-existent resources.",
+            "parentId": "undefined"
+          },
+          {
+            "id": 2,
+            "title": "Create Global Leaderboard UI Component",
+            "description": "Implement the leaderboard UI component with user rankings, pagination, and time period filters.",
+            "dependencies": [
+              "16.1"
+            ],
+            "details": "Create a responsive leaderboard component that displays:\n- Ranked list of users by total points\n- User profile photos and names\n- Point totals and recent performance indicators\n- Pagination controls for navigating through large leaderboards\n- Time period filters (current race, season, all-time)\n\nImplement the component using React with TypeScript, following the example structure provided. Use React Query for data fetching and state management. Ensure the component handles loading states, errors, and empty results gracefully.",
+            "status": "pending",
+            "testStrategy": "Test rendering with mock data. Verify correct sorting and ranking display. Test pagination functionality. Verify time frame filtering works correctly. Test responsive behavior on different screen sizes.",
+            "parentId": "undefined"
+          },
+          {
+            "id": 3,
+            "title": "Implement User Profile Page",
+            "description": "Create the user profile page showing user details, statistics, and prediction history.",
+            "dependencies": [
+              "16.1"
+            ],
+            "details": "Build a comprehensive user profile page that includes:\n- User details section with photo, name, and basic information\n- Overall statistics panel (total points, current rank, events participated)\n- Performance metrics section showing hit rate and average margin\n- Tabbed interface for prediction history with filtering options\n- Per-prop type breakdown of prediction accuracy\n\nImplement with React Router for navigation and React Query for data fetching. Ensure the page is responsive and provides clear navigation between different sections of the profile.",
+            "status": "pending",
+            "testStrategy": "Test profile page rendering with different user data. Verify correct statistics display. Test navigation between profile sections. Verify prediction history filtering. Test with users having different levels of activity.",
+            "parentId": "undefined"
+          },
+          {
+            "id": 4,
+            "title": "Develop Data Visualization Components for Performance Metrics",
+            "description": "Create reusable chart components to visualize user performance statistics and prediction accuracy.",
+            "dependencies": [
+              "16.2",
+              "16.3"
+            ],
+            "details": "Implement data visualization components using Chart.js or a similar library:\n- Line chart for performance trends over time\n- Bar chart for accuracy by prop type\n- Pie/donut chart for overall hit rate visualization\n- Comparison charts showing user vs. league average\n\nCreate wrapper components that handle data formatting, responsive sizing, and consistent styling. Implement tooltips for detailed information on hover. Ensure visualizations are accessible and include appropriate text alternatives.",
+            "status": "pending",
+            "testStrategy": "Test chart rendering with various data sets. Verify calculation accuracy for all statistics. Test responsive behavior of visualizations. Verify correct tooltip information. Test accessibility features.",
+            "parentId": "undefined"
+          },
+          {
+            "id": 5,
+            "title": "Add Social Sharing and Navigation Integration",
+            "description": "Implement social sharing functionality and integrate the leaderboard and profile pages into the main application navigation.",
+            "dependencies": [
+              "16.2",
+              "16.3",
+              "16.4"
+            ],
+            "details": "Add the following features:\n- Social sharing buttons for sharing profile and leaderboard standings\n- Custom share cards with user statistics and achievements\n- Navigation links to leaderboard and profile pages in the main app header\n- Deep linking support for sharing specific views\n- Notifications for rank changes and achievements\n\nImplement using appropriate social sharing libraries. Ensure shared content includes engaging metadata and preview images. Update the application's routing configuration to include the new pages. Add appropriate SEO metadata for the new pages.",
+            "status": "pending",
+            "testStrategy": "Test social sharing functionality across different platforms. Verify correct metadata appears in shared links. Test navigation paths to and from leaderboard and profile pages. Verify deep links work correctly. Test notification display for various events.",
+            "parentId": "undefined"
+          }
+        ]
+      },
+      {
+        "id": "17",
+        "title": "Implement Camera Integration for Profile Photos and QR Scanning",
+        "description": "Add camera functionality to allow users to take profile photos and scan QR codes for joining leagues.",
+        "details": "1. Implement camera access using browser APIs:\n   - Request camera permissions\n   - Create video stream capture\n   - Handle mobile and desktop differences\n2. Build profile photo capture UI:\n   - Live camera preview\n   - Capture button\n   - Image cropping/editing\n   - Upload to storage\n3. Implement QR code scanning:\n   - Camera viewfinder UI\n   - QR code detection using library like jsQR\n   - League join URL parsing\n   - Confirmation dialog\n4. Set up Firebase Storage for image hosting\n5. Create API endpoints for updating profile photos\n6. Implement QR code generation for league invites\n\nExample camera component for profile photos:\n```tsx\nconst ProfilePhotoCapture = ({ onPhotoCapture }) => {\n  const videoRef = useRef(null);\n  const [stream, setStream] = useState(null);\n  const [error, setError] = useState(null);\n  \n  useEffect(() => {\n    async function setupCamera() {\n      try {\n        const mediaStream = await navigator.mediaDevices.getUserMedia({\n          video: { facingMode: 'user' }\n        });\n        setStream(mediaStream);\n        if (videoRef.current) {\n          videoRef.current.srcObject = mediaStream;\n        }\n      } catch (err) {\n        setError('Camera access denied or not available');\n        console.error(err);\n      }\n    }\n    \n    setupCamera();\n    return () => {\n      if (stream) {\n        stream.getTracks().forEach(track => track.stop());\n      }\n    };\n  }, []);\n  \n  const capturePhoto = () => {\n    if (!videoRef.current) return;\n    \n    const canvas = document.createElement('canvas');\n    canvas.width = videoRef.current.videoWidth;\n    canvas.height = videoRef.current.videoHeight;\n    \n    const ctx = canvas.getContext('2d');\n    ctx.drawImage(videoRef.current, 0, 0);\n    \n    const dataUrl = canvas.toDataURL('image/jpeg');\n    onPhotoCapture(dataUrl);\n  };\n  \n  if (error) return <div className=\"text-red-500\">{error}</div>;\n  \n  return (\n    <div className=\"relative\">\n      <video\n        ref={videoRef}\n        autoPlay\n        playsInline\n        className=\"rounded-lg w-full\"\n      />\n      <button\n        onClick={capturePhoto}\n        className=\"absolute bottom-4 left-1/2 transform -translate-x-1/2 bg-white rounded-full p-3 shadow\"\n      >\n        <CameraIcon className=\"w-6 h-6\" />\n      </button>\n    </div>\n  );\n};\n```",
+        "testStrategy": "1. Test camera permission requests and handling\n2. Verify photo capture and preview functionality\n3. Test image upload to Firebase Storage\n4. Verify QR code scanning accuracy with various codes\n5. Test league joining via QR code\n6. Validate error handling for camera access issues\n7. Test on multiple browsers and devices\n8. Verify fallback options when camera is not available",
+        "priority": "medium",
+        "dependencies": [
+          "13"
+        ],
+        "status": "pending",
+        "subtasks": [
+          {
+            "id": 1,
+            "title": "Implement Camera Access and Permission Handling",
+            "description": "Create a reusable component that handles camera access permissions, stream initialization, and error handling for both mobile and desktop browsers.",
+            "dependencies": [],
+            "details": "Create a custom React hook `useCamera` that: 1) Requests camera permissions using navigator.mediaDevices.getUserMedia, 2) Sets up video stream with appropriate facing mode (user/environment), 3) Handles permission denials and device errors, 4) Provides methods to switch cameras on mobile devices, 5) Implements proper cleanup of media streams when component unmounts. Include browser compatibility checks and fallbacks for older browsers.",
+            "status": "pending",
+            "testStrategy": "Test permission request flows with mock implementations of mediaDevices API. Verify stream initialization and cleanup. Test on multiple browsers and devices. Validate error handling for permission denials and hardware issues.",
+            "parentId": "undefined"
+          },
+          {
+            "id": 2,
+            "title": "Build Profile Photo Capture UI Component",
+            "description": "Implement a UI component for capturing, previewing, and cropping profile photos using the camera.",
+            "dependencies": [
+              "17.1"
+            ],
+            "details": "Create a ProfilePhotoCapture component that: 1) Uses the useCamera hook for stream access, 2) Displays live camera preview in a styled container, 3) Provides capture button and flash options, 4) Implements canvas-based photo capture from video stream, 5) Adds basic image editing capabilities (crop to square, rotate, zoom), 6) Generates optimized JPEG output for upload, 7) Handles orientation issues on mobile devices.",
+            "status": "pending",
+            "testStrategy": "Test photo capture functionality across devices. Verify image quality and format. Test cropping and editing features. Ensure proper handling of device orientation changes. Validate accessibility of capture controls.",
+            "parentId": "undefined"
+          },
+          {
+            "id": 3,
+            "title": "Implement QR Code Scanning Functionality",
+            "description": "Create a QR code scanner component that can detect and parse league invitation QR codes.",
+            "dependencies": [
+              "17.1"
+            ],
+            "details": "Implement a QRCodeScanner component that: 1) Uses the useCamera hook with environment-facing camera, 2) Integrates jsQR library for code detection, 3) Processes video frames at appropriate intervals (15-30fps), 4) Highlights detected QR codes with overlay, 5) Parses league invitation URLs from QR codes, 6) Validates QR code format and content, 7) Provides haptic feedback on successful scan, 8) Includes scanning guidelines UI overlay.",
+            "status": "pending",
+            "testStrategy": "Test QR code detection with various code formats and sizes. Verify parsing of different URL formats. Test scanning performance on low-end devices. Validate error handling for invalid QR codes. Test in different lighting conditions.",
+            "parentId": "undefined"
+          },
+          {
+            "id": 4,
+            "title": "Set Up Firebase Storage for Image Uploads",
+            "description": "Configure Firebase Storage for profile photo uploads and implement secure upload functionality.",
+            "dependencies": [],
+            "details": "1) Configure Firebase Storage with appropriate security rules limiting uploads to authenticated users, 2) Create size and type restrictions for uploads, 3) Implement a uploadProfilePhoto function that compresses images before upload, 4) Generate unique filenames based on user ID and timestamp, 5) Set appropriate metadata and caching headers, 6) Create download URL generation for uploaded images, 7) Implement progress tracking during uploads.",
+            "status": "pending",
+            "testStrategy": "Test upload functionality with various image sizes and formats. Verify security rules prevent unauthorized uploads. Test compression effectiveness. Validate progress tracking accuracy. Test error handling for upload failures and network interruptions.",
+            "parentId": "undefined"
+          },
+          {
+            "id": 5,
+            "title": "Integrate Camera Components with User Flows",
+            "description": "Connect the camera components to profile editing and league joining flows, including API integration.",
+            "dependencies": [
+              "17.2",
+              "17.3",
+              "17.4"
+            ],
+            "details": "1) Add profile photo capture to user profile edit page, 2) Implement API endpoints for updating user profile photos, 3) Create QR code scanning option in league join flow, 4) Implement league join confirmation dialog after successful QR scan, 5) Add QR code generation for league invitations using qrcode.react, 6) Create shareable league invitation links, 7) Handle deep linking for league invitations, 8) Implement proper loading and error states during API operations.",
+            "status": "pending",
+            "testStrategy": "Test end-to-end user flows for profile photo updates. Verify league joining via QR codes works correctly. Test QR code generation for different league types. Validate API integration for profile updates. Test deep linking functionality across platforms.",
+            "parentId": "undefined"
+          }
+        ]
+      },
+      {
+        "id": "18",
+        "title": "Implement Geolocation for Localized Times and Nearest Circuit",
+        "description": "Add geolocation functionality to display session times in the user's local timezone and show the nearest F1 circuit.",
+        "details": "1. Implement browser geolocation API integration:\n   - Request location permissions\n   - Get user coordinates\n   - Handle permission denials gracefully\n2. Create timezone conversion utilities:\n   - Convert UTC event times to local time\n   - Format dates and times according to locale\n   - Display countdown timers in local time\n3. Implement nearest circuit finder:\n   - Store circuit coordinates in database\n   - Calculate distance to each circuit\n   - Display nearest circuit with distance\n4. Add location-based personalization:\n   - Highlight local/national drivers\n   - Show distance and travel time to nearest event\n5. Implement fallback for denied location permissions\n\nExample geolocation implementation:\n```typescript\nconst useGeolocation = () => {\n  const [location, setLocation] = useState(null);\n  const [error, setError] = useState(null);\n  const [loading, setLoading] = useState(true);\n  \n  useEffect(() => {\n    if (!navigator.geolocation) {\n      setError('Geolocation is not supported by your browser');\n      setLoading(false);\n      return;\n    }\n    \n    navigator.geolocation.getCurrentPosition(\n      (position) => {\n        setLocation({\n          latitude: position.coords.latitude,\n          longitude: position.coords.longitude\n        });\n        setLoading(false);\n      },\n      (error) => {\n        setError(`Error getting location: ${error.message}`);\n        setLoading(false);\n      },\n      { enableHighAccuracy: false, timeout: 5000, maximumAge: 86400000 } // 24h cache\n    );\n  }, []);\n  \n  return { location, error, loading };\n};\n\nconst findNearestCircuit = (userLocation, circuits) => {\n  if (!userLocation) return null;\n  \n  return circuits.reduce((nearest, circuit) => {\n    const distance = calculateDistance(\n      userLocation.latitude,\n      userLocation.longitude,\n      circuit.latitude,\n      circuit.longitude\n    );\n    \n    if (!nearest || distance < nearest.distance) {\n      return { circuit, distance };\n    }\n    return nearest;\n  }, null);\n};\n\nconst calculateDistance = (lat1, lon1, lat2, lon2) => {\n  // Haversine formula implementation\n  const R = 6371; // Earth radius in km\n  const dLat = (lat2 - lat1) * Math.PI / 180;\n  const dLon = (lon2 - lon1) * Math.PI / 180;\n  const a = \n    Math.sin(dLat/2) * Math.sin(dLat/2) +\n    Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) * \n    Math.sin(dLon/2) * Math.sin(dLon/2);\n  const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));\n  return R * c; // Distance in km\n};\n```",
+        "testStrategy": "1. Test geolocation permission requests and handling\n2. Verify timezone conversion accuracy\n3. Test nearest circuit calculation with various locations\n4. Verify fallback behavior when location is denied\n5. Test on multiple browsers and devices\n6. Validate distance calculations\n7. Test persistence of location preferences\n8. Verify performance impact of geolocation features",
+        "priority": "medium",
+        "dependencies": [
+          "14"
+        ],
+        "status": "pending",
+        "subtasks": [
+          {
+            "id": 1,
+            "title": "Implement Browser Geolocation API Integration",
+            "description": "Create a React hook that handles browser geolocation API requests, including permission handling, coordinate retrieval, and error states.",
+            "dependencies": [],
+            "details": "Create a useGeolocation hook that: 1) Checks if geolocation is supported by the browser, 2) Requests user permission to access location, 3) Retrieves latitude and longitude coordinates, 4) Handles loading states during permission requests, 5) Manages error states for permission denials or technical failures, 6) Implements appropriate caching to avoid excessive permission requests. Include configuration options for accuracy requirements and timeout settings.",
+            "status": "pending",
+            "testStrategy": "Test permission request flows with mock geolocation API. Verify correct handling of permission granted, denied, and timeout scenarios. Test caching mechanism to ensure it respects the configured maximumAge parameter.",
+            "parentId": "undefined"
+          },
+          {
+            "id": 2,
+            "title": "Create Timezone Conversion Utilities",
+            "description": "Develop utility functions to convert UTC event times to the user's local timezone based on geolocation data.",
+            "dependencies": [
+              "18.1"
+            ],
+            "details": "Implement timezone utilities that: 1) Accept UTC timestamps from event data, 2) Convert timestamps to the user's local timezone using the Intl API or a library like date-fns-tz, 3) Format dates and times according to the user's locale preferences, 4) Create countdown timers that display time remaining until events in the user's local time, 5) Handle edge cases like daylight saving time transitions. Ensure all displayed times clearly indicate the timezone being used.",
+            "status": "pending",
+            "testStrategy": "Test conversion accuracy across multiple timezones. Verify formatting follows locale conventions. Test countdown timer accuracy and updates. Validate handling of daylight saving time transitions.",
+            "parentId": "undefined"
+          },
+          {
+            "id": 3,
+            "title": "Implement Circuit Database and Distance Calculator",
+            "description": "Create a database structure to store circuit coordinates and implement the distance calculation algorithm to find the nearest circuit to the user.",
+            "dependencies": [],
+            "details": "1) Design a database schema to store circuit information including name, location, coordinates (latitude/longitude), and other relevant metadata. 2) Implement the Haversine formula for calculating distances between coordinates as shown in the example code. 3) Create a function that accepts user coordinates and returns the nearest circuit with distance information. 4) Add caching for distance calculations to improve performance. 5) Include fallback circuits or popular circuits when user location is unavailable.",
+            "status": "pending",
+            "testStrategy": "Test distance calculation accuracy with known coordinate pairs. Verify the nearest circuit finder returns correct results for various global locations. Test performance with the full circuit database.",
+            "parentId": "undefined"
+          },
+          {
+            "id": 4,
+            "title": "Develop UI Components for Location-Based Features",
+            "description": "Create React components to display localized time information and nearest circuit details in the user interface.",
+            "dependencies": [
+              "18.1",
+              "18.2",
+              "18.3"
+            ],
+            "details": "Develop UI components that: 1) Display event times in both UTC and the user's local timezone, 2) Show countdown timers to upcoming sessions, 3) Present the nearest circuit information with distance and potentially travel time, 4) Highlight local/national drivers based on user location, 5) Include visual indicators for the user's current timezone, 6) Implement responsive designs that work across device sizes. Ensure components gracefully handle loading states and location permission denials.",
+            "status": "pending",
+            "testStrategy": "Test component rendering with various location data scenarios. Verify responsive behavior across device sizes. Test accessibility compliance. Validate that components handle loading, error, and empty states appropriately.",
+            "parentId": "undefined"
+          },
+          {
+            "id": 5,
+            "title": "Implement Location Permission Fallbacks and Persistence",
+            "description": "Create fallback mechanisms for when location permissions are denied and implement persistence for location preferences.",
+            "dependencies": [
+              "18.1",
+              "18.4"
+            ],
+            "details": "1) Implement a fallback system that allows users to manually select their location or timezone when geolocation permissions are denied. 2) Create a location preference persistence layer using localStorage or similar browser storage. 3) Add a user interface for managing location preferences, including the ability to clear saved location data. 4) Implement a notification system to inform users about location permission status and options. 5) Ensure the application works effectively without location data by using IP-based geolocation as a secondary option or defaulting to popular timezones.",
+            "status": "pending",
+            "testStrategy": "Test the complete permission flow including denials and subsequent manual location selection. Verify persistence works across page reloads and browser sessions. Test the IP-based geolocation fallback accuracy. Validate that users can successfully manage their location preferences.",
+            "parentId": "undefined"
+          }
+        ]
+      },
+      {
+        "id": "19",
+        "title": "Develop Analytics and Statistics Visualization",
+        "description": "Create data visualization components to display user performance statistics, prediction accuracy, and historical trends.",
+        "details": "1. Implement analytics dashboard components:\n   - Overall hit rate visualization\n   - Per-prop type accuracy breakdown\n   - Performance trend over time\n   - Comparison to league average\n2. Create chart components using a library like Chart.js or D3:\n   - Bar charts for prop-type accuracy\n   - Line charts for performance over time\n   - Radar charts for skill breakdown\n   - Heatmaps for circuit performance\n3. Implement statistics calculation functions:\n   - Hit rate (exact matches / total predictions)\n   - Average margin of error\n   - Consistency metrics\n   - Strongest/weakest prediction types\n4. Add API endpoints for analytics data:\n   - GET /users/{id}/analytics\n   - GET /leagues/{id}/analytics\n5. Implement data export functionality\n\nExample analytics component:\n```tsx\nconst UserAnalytics = ({ userId }) => {\n  const { data, isLoading, error } = useQuery(\n    ['userAnalytics', userId],\n    () => fetchUserAnalytics(userId)\n  );\n  \n  if (isLoading) return <LoadingSpinner />;\n  if (error) return <ErrorMessage error={error} />;\n  \n  const { hitRate, propTypeAccuracy, performanceTrend, comparison } = data;\n  \n  return (\n    <div className=\"space-y-6\">\n      <div className=\"bg-white rounded-lg shadow p-4\">\n        <h3 className=\"text-lg font-medium mb-3\">Overall Performance</h3>\n        <div className=\"flex items-center\">\n          <div className=\"w-24 h-24 relative\">\n            <CircularProgressBar \n              percentage={hitRate * 100} \n              color={hitRate > 0.5 ? 'green' : 'orange'} \n            />\n            <div className=\"absolute inset-0 flex items-center justify-center\">\n              <span className=\"text-xl font-bold\">{(hitRate * 100).toFixed(1)}%</span>\n            </div>\n          </div>\n          <div className=\"ml-4\">\n            <p className=\"text-sm text-gray-600\">Hit Rate</p>\n            <p className=\"text-sm text-gray-600 mt-1\">\n              {comparison.text} ({comparison.value > 0 ? '+' : ''}{comparison.value.toFixed(1)}%)\n            </p>\n          </div>\n        </div>\n      </div>\n      \n      <div className=\"bg-white rounded-lg shadow p-4\">\n        <h3 className=\"text-lg font-medium mb-3\">Prediction Accuracy by Type</h3>\n        <BarChart \n          data={propTypeAccuracy.map(item => ({\n            label: item.propType,\n            value: item.accuracy * 100\n          }))} \n          yAxisLabel=\"Accuracy %\"\n          height={200}\n        />\n      </div>\n      \n      <div className=\"bg-white rounded-lg shadow p-4\">\n        <h3 className=\"text-lg font-medium mb-3\">Performance Trend</h3>\n        <LineChart \n          data={performanceTrend.map(item => ({\n            x: new Date(item.date),\n            y: item.accuracy * 100\n          }))} \n          xAxisLabel=\"Event\"\n          yAxisLabel=\"Accuracy %\"\n          height={200}\n        />\n      </div>\n    </div>\n  );\n};\n```",
+        "testStrategy": "1. Test chart rendering with various data sets\n2. Verify calculation accuracy for all statistics\n3. Test responsive behavior of visualizations\n4. Validate API endpoints for analytics data\n5. Test edge cases (no data, partial data)\n6. Verify performance with large data sets\n7. Test data export functionality\n8. Validate accessibility of visualizations\n9. Test browser compatibility for all chart types",
+        "priority": "low",
+        "dependencies": [
+          "15",
+          "16"
+        ],
+        "status": "pending",
+        "subtasks": [
+          {
+            "id": 1,
+            "title": "Implement Core Chart Components",
+            "description": "Create reusable chart components using Chart.js that will be used throughout the analytics dashboard. This includes bar charts, line charts, radar charts, and circular progress indicators.",
+            "dependencies": [],
+            "details": "Create a components/charts directory with the following files:\n1. BarChart.tsx - For displaying prop-type accuracy\n2. LineChart.tsx - For performance trends over time\n3. RadarChart.tsx - For skill breakdown visualization\n4. CircularProgressBar.tsx - For overall hit rate display\n5. HeatMap.tsx - For circuit performance visualization\n\nEach component should accept standardized props for data, labels, colors, and dimensions. Implement responsive design using Chart.js responsive options. Add TypeScript interfaces for all component props.",
+            "status": "pending",
+            "testStrategy": "Test each chart component with various data sets including empty data, single data point, and multiple data points. Verify responsive behavior by testing at different viewport sizes. Create snapshot tests for each chart type.",
+            "parentId": "undefined"
+          },
+          {
+            "id": 2,
+            "title": "Implement Statistics Calculation Functions",
+            "description": "Create utility functions to calculate various performance metrics from raw prediction data, including hit rates, margins of error, consistency metrics, and performance by prediction type.",
+            "dependencies": [],
+            "details": "Create a utils/analytics.ts file with the following functions:\n1. calculateHitRate(predictions) - Calculate exact matches divided by total predictions\n2. calculateMarginOfError(predictions) - Calculate average difference between prediction and actual result\n3. calculateConsistencyMetrics(predictions) - Calculate standard deviation of prediction accuracy\n4. identifyStrengthsWeaknesses(predictions) - Determine best and worst prediction categories\n5. calculateLeagueComparison(userStats, leagueStats) - Compare user performance to league averages\n\nEach function should be properly typed with TypeScript interfaces for input and output data.",
+            "status": "pending",
+            "testStrategy": "Create comprehensive unit tests for each calculation function with various test cases including edge cases (empty arrays, null values, etc.). Verify calculations against manually computed expected results.",
+            "parentId": "undefined"
+          },
+          {
+            "id": 3,
+            "title": "Create API Services for Analytics Data",
+            "description": "Implement API service functions to fetch analytics data from the backend, including user analytics, league analytics, and historical performance data.",
+            "dependencies": [],
+            "details": "Create a services/analyticsService.ts file with the following functions:\n1. fetchUserAnalytics(userId) - Get overall user performance statistics\n2. fetchLeagueAnalytics(leagueId) - Get league-wide statistics\n3. fetchPerformanceTrend(userId, timeRange) - Get historical performance data\n4. fetchPropTypeBreakdown(userId) - Get accuracy breakdown by prediction type\n5. fetchCircuitPerformance(userId) - Get performance data by circuit\n\nImplement proper error handling, loading states, and data caching using React Query. Add TypeScript interfaces for all API responses.",
+            "status": "pending",
+            "testStrategy": "Mock API responses using MSW (Mock Service Worker) and test successful data fetching, error handling, and loading states. Verify that the correct endpoints are called with appropriate parameters.",
+            "parentId": "undefined"
+          },
+          {
+            "id": 4,
+            "title": "Build User Analytics Dashboard Components",
+            "description": "Create the main analytics dashboard components that will display user performance statistics using the chart components and data services.",
+            "dependencies": [
+              "19.1",
+              "19.2",
+              "19.3"
+            ],
+            "details": "Create the following components:\n1. components/analytics/OverallPerformance.tsx - Shows hit rate with circular progress bar and comparison to league average\n2. components/analytics/PropTypeAccuracy.tsx - Displays bar chart of accuracy by prop type\n3. components/analytics/PerformanceTrend.tsx - Shows line chart of performance over time\n4. components/analytics/SkillBreakdown.tsx - Displays radar chart of different prediction skills\n5. components/analytics/CircuitPerformance.tsx - Shows heatmap of performance by circuit\n\nCombine these into a UserAnalyticsDashboard.tsx component that fetches and displays all user analytics data.",
+            "status": "pending",
+            "testStrategy": "Test each dashboard component individually and the combined dashboard with mock data. Verify proper loading states, error handling, and data display. Test responsive behavior on different screen sizes.",
+            "parentId": "undefined"
+          },
+          {
+            "id": 5,
+            "title": "Implement Data Export Functionality",
+            "description": "Add functionality to export analytics data in various formats (CSV, JSON) for users to download and use externally.",
+            "dependencies": [
+              "19.2",
+              "19.3",
+              "19.4"
+            ],
+            "details": "Create an ExportAnalytics.tsx component with:\n1. Export options dropdown (CSV, JSON)\n2. Time range selector for data to export\n3. Selection for which metrics to include\n4. Download button that triggers the export\n\nImplement utility functions in utils/exportUtils.ts:\n1. formatDataForCSV(analyticsData)\n2. formatDataForJSON(analyticsData)\n3. generateDownloadFile(formattedData, format)\n\nAdd this component to the analytics dashboard with a prominent export button.",
+            "status": "pending",
+            "testStrategy": "Test export functionality with various data sets and export formats. Verify the structure and content of exported files. Test with different browsers to ensure download functionality works across platforms.",
+            "parentId": "undefined"
+          }
+        ]
+      },
+      {
+        "id": "20",
+        "title": "Implement API Documentation and Error Handling",
+        "description": "Create comprehensive API documentation, implement robust error handling, and add monitoring for the F1 Picks application.",
+        "details": "1. Implement global error handling:\n   - Frontend error boundary components\n   - Backend exception middleware\n   - Structured error responses\n   - User-friendly error messages\n2. Create API documentation using FastAPI's built-in Swagger/OpenAPI:\n   - Document all endpoints\n   - Add request/response examples\n   - Include authentication requirements\n   - Document error responses\n3. Implement logging and monitoring:\n   - Application logs with structured format\n   - Error tracking integration (Sentry)\n   - Performance monitoring\n   - Usage analytics\n4. Add health check endpoints:\n   - API health status\n   - Database connectivity\n   - Worker status\n5. Implement rate limiting and security headers\n\nExample error handling middleware:\n```python\nfrom fastapi import FastAPI, Request, status\nfrom fastapi.responses import JSONResponse\nfrom fastapi.exceptions import RequestValidationError\nfrom pydantic import ValidationError\nimport logging\nimport sentry_sdk\n\nlogger = logging.getLogger(__name__)\n\napp = FastAPI()\n\nsentry_sdk.init(dsn=\"YOUR_SENTRY_DSN\")\n\n@app.exception_handler(RequestValidationError)\nasync def validation_exception_handler(request: Request, exc: RequestValidationError):\n    logger.warning(f\"Validation error: {exc}\")\n    return JSONResponse(\n        status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,\n        content={\n            \"error\": \"Validation Error\",\n            \"detail\": exc.errors(),\n            \"request_id\": request.state.request_id\n        }\n    )\n\n@app.exception_handler(Exception)\nasync def general_exception_handler(request: Request, exc: Exception):\n    logger.error(f\"Unhandled exception: {exc}\", exc_info=True)\n    sentry_sdk.capture_exception(exc)\n    return JSONResponse(\n        status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,\n        content={\n            \"error\": \"Internal Server Error\",\n            \"message\": \"An unexpected error occurred\",\n            \"request_id\": request.state.request_id\n        }\n    )\n\n@app.middleware(\"http\")\nasync def request_middleware(request: Request, call_next):\n    request_id = str(uuid.uuid4())\n    request.state.request_id = request_id\n    \n    try:\n        response = await call_next(request)\n        return response\n    except Exception as exc:\n        logger.error(f\"Unhandled exception: {exc}\", exc_info=True)\n        sentry_sdk.capture_exception(exc)\n        return JSONResponse(\n            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,\n            content={\n                \"error\": \"Internal Server Error\",\n                \"message\": \"An unexpected error occurred\",\n                \"request_id\": request_id\n            }\n        )\n```",
+        "testStrategy": "1. Test error handling for various error scenarios\n2. Verify API documentation accuracy and completeness\n3. Test logging captures appropriate information\n4. Validate error responses follow consistent format\n5. Test health check endpoints\n6. Verify rate limiting functionality\n7. Test security headers implementation\n8. Validate monitoring integration\n9. Test error tracking with Sentry\n10. Verify documentation is accessible and user-friendly",
+        "priority": "medium",
+        "dependencies": [
+          "11",
+          "12",
+          "13",
+          "14",
+          "15"
+        ],
+        "status": "pending",
+        "subtasks": [
+          {
+            "id": 1,
+            "title": "Implement Backend Error Handling Middleware",
+            "description": "Create a robust error handling middleware for the FastAPI backend that captures exceptions, logs errors, and returns structured error responses to clients.",
+            "dependencies": [],
+            "details": "1. Create a middleware function that wraps all API requests\n2. Generate and attach a unique request ID to each request\n3. Implement specific exception handlers for common errors (validation errors, authentication errors, not found errors)\n4. Set up a general exception handler for unexpected errors\n5. Integrate with Sentry for error tracking\n6. Ensure all error responses follow a consistent format with error code, message, and request ID\n7. Add appropriate logging with different severity levels\n8. Include context information in error logs",
+            "status": "pending",
+            "testStrategy": "1. Test with various error scenarios (validation errors, database errors, etc.)\n2. Verify error responses contain the expected structure\n3. Check that request IDs are properly generated and included\n4. Confirm errors are properly logged with correct severity\n5. Validate Sentry integration by triggering test errors",
+            "parentId": "undefined"
+          },
+          {
+            "id": 2,
+            "title": "Implement Frontend Error Boundary Components",
+            "description": "Create React error boundary components to gracefully handle and display frontend errors without crashing the application.",
+            "dependencies": [
+              "20.1"
+            ],
+            "details": "1. Create a global ErrorBoundary component that wraps the main application\n2. Implement component-level error boundaries for critical sections\n3. Design user-friendly error messages and fallback UI components\n4. Add error reporting to send frontend errors to the backend\n5. Implement automatic retry logic for transient errors\n6. Create toast notifications for non-critical errors\n7. Add error details expansion for developers in non-production environments\n8. Implement network error detection and appropriate messaging",
+            "status": "pending",
+            "testStrategy": "1. Test error boundaries by intentionally throwing errors in components\n2. Verify the application doesn't crash when errors occur\n3. Check that error messages are user-friendly\n4. Validate that errors are properly reported to the backend\n5. Test fallback UI components render correctly",
+            "parentId": "undefined"
+          },
+          {
+            "id": 3,
+            "title": "Create API Documentation with Swagger/OpenAPI",
+            "description": "Enhance the FastAPI application with comprehensive API documentation using the built-in Swagger/OpenAPI integration.",
+            "dependencies": [
+              "20.1"
+            ],
+            "details": "1. Add detailed docstrings to all API endpoints\n2. Include request and response examples for each endpoint\n3. Document authentication requirements and how to provide credentials\n4. Add tags to group related endpoints\n5. Document all possible error responses\n6. Include schema definitions for all request/response models\n7. Add operation IDs for each endpoint\n8. Configure the OpenAPI settings to include version, contact info, and terms of service\n9. Add descriptions for all path and query parameters",
+            "status": "pending",
+            "testStrategy": "1. Verify all endpoints are properly documented in the Swagger UI\n2. Test that examples work correctly when tried from the Swagger UI\n3. Check that authentication requirements are clearly documented\n4. Validate that all models have proper descriptions\n5. Ensure error responses are documented for each endpoint",
+            "parentId": "undefined"
+          },
+          {
+            "id": 4,
+            "title": "Implement Logging and Monitoring System",
+            "description": "Set up a comprehensive logging and monitoring system to track application performance, errors, and usage patterns.",
+            "dependencies": [
+              "20.1",
+              "20.2"
+            ],
+            "details": "1. Configure structured JSON logging for the application\n2. Set up different log levels (DEBUG, INFO, WARNING, ERROR)\n3. Implement request/response logging with sensitive data redaction\n4. Create custom logging middleware to capture request duration\n5. Set up Sentry integration for error tracking with environment configuration\n6. Implement performance monitoring for database queries and API calls\n7. Add usage analytics tracking for key user actions\n8. Create a logging utility for consistent log formatting across the application",
+            "status": "pending",
+            "testStrategy": "1. Verify logs are properly formatted and contain necessary context\n2. Test that sensitive information is properly redacted\n3. Check that performance metrics are accurately captured\n4. Validate Sentry captures errors with proper context\n5. Test log rotation and retention policies\n6. Verify different log levels work as expected",
+            "parentId": "undefined"
+          },
+          {
+            "id": 5,
+            "title": "Add Health Checks and Security Headers",
+            "description": "Implement health check endpoints and security headers to improve application reliability and security.",
+            "dependencies": [
+              "20.1",
+              "20.4"
+            ],
+            "details": "1. Create health check endpoints for API status\n2. Implement database connectivity checks\n3. Add worker status monitoring\n4. Implement rate limiting middleware with configurable limits\n5. Add security headers (Content-Security-Policy, X-XSS-Protection, etc.)\n6. Create a circuit breaker for external service calls\n7. Implement graceful degradation for non-critical services\n8. Add a status page that aggregates health information\n9. Implement throttling for authentication attempts",
+            "status": "pending",
+            "testStrategy": "1. Test health check endpoints return correct status\n2. Verify rate limiting blocks excessive requests\n3. Check security headers are present in all responses\n4. Test database connectivity checks with both successful and failed scenarios\n5. Validate circuit breaker functionality by simulating external service failures\n6. Test authentication throttling with repeated login attempts",
+            "parentId": "undefined"
+          }
+        ]
+      }
+    ],
+    "metadata": {
+      "version": "1.0.0",
+      "lastModified": "2025-09-26T03:37:12.924Z",
+      "taskCount": 10,
+      "completedCount": 0,
+      "tags": [
+        "master"
+      ]
+    }
+  }
+}
