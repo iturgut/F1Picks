@@ -1,0 +1,14 @@
+{
+  "name": "@f1picks/shared",
+  "version": "1.0.0",
+  "description": "Shared utilities and types for F1 Picks",
+  "main": "index.js",
+  "types": "index.d.ts",
+  "scripts": {
+    "build": "tsc",
+    "dev": "tsc --watch"
+  },
+  "devDependencies": {
+    "typescript": "^5.0.0"
+  }
+}
