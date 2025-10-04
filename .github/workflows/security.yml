@@ -66,10 +66,10 @@ jobs:
           npm audit --audit-level moderate
           cd frontend && npm audit --audit-level moderate
 
-      - name: Run Python safety check
+      - name: Run Python safety scan
         run: |
           pip install safety
-          cd backend && safety check
+          cd backend && safety scan
 
   # Container security scan
   container-scan:

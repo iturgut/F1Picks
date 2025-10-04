@@ -1,0 +1,98 @@
+{
+  "$schema": "https://docs.renovatebot.com/renovate-schema.json",
+  "extends": [
+    "config:recommended",
+    ":dependencyDashboard",
+    ":semanticCommits",
+    ":separateMajorReleases"
+  ],
+  "schedule": [
+    "before 10am on monday"
+  ],
+  "timezone": "America/Los_Angeles",
+  "prConcurrentLimit": 5,
+  "prHourlyLimit": 2,
+  "labels": ["dependencies"],
+  "assignees": ["@iturgut"],
+  "reviewers": ["@iturgut"],
+  "packageRules": [
+    {
+      "description": "Group all non-major dependencies together",
+      "matchUpdateTypes": ["minor", "patch", "pin", "digest"],
+      "groupName": "all non-major dependencies",
+      "groupSlug": "all-minor-patch"
+    },
+    {
+      "description": "Automerge non-major updates",
+      "matchUpdateTypes": ["minor", "patch", "pin", "digest"],
+      "automerge": true,
+      "automergeType": "pr",
+      "automergeStrategy": "squash"
+    },
+    {
+      "description": "Frontend dependencies",
+      "matchPaths": ["frontend/**"],
+      "semanticCommitType": "deps",
+      "semanticCommitScope": "frontend",
+      "labels": ["dependencies", "frontend"]
+    },
+    {
+      "description": "Backend dependencies",
+      "matchPaths": ["backend/**"],
+      "semanticCommitType": "deps",
+      "semanticCommitScope": "backend",
+      "labels": ["dependencies", "backend"]
+    },
+    {
+      "description": "Shared dependencies",
+      "matchPaths": ["shared/**"],
+      "semanticCommitType": "deps",
+      "semanticCommitScope": "shared",
+      "labels": ["dependencies", "shared"]
+    },
+    {
+      "description": "Root dependencies",
+      "matchPaths": ["package.json"],
+      "semanticCommitType": "deps",
+      "semanticCommitScope": "root",
+      "labels": ["dependencies", "root"]
+    },
+    {
+      "description": "GitHub Actions",
+      "matchManagers": ["github-actions"],
+      "semanticCommitType": "deps",
+      "semanticCommitScope": "actions",
+      "labels": ["dependencies", "github-actions"],
+      "pinDigests": true
+    },
+    {
+      "description": "Docker images",
+      "matchManagers": ["dockerfile", "docker-compose"],
+      "semanticCommitType": "deps",
+      "semanticCommitScope": "docker",
+      "labels": ["dependencies", "docker"],
+      "pinDigests": true
+    },
+    {
+      "description": "Python dependencies - use uv lock file",
+      "matchManagers": ["pip_requirements"],
+      "rangeStrategy": "pin"
+    }
+  ],
+  "vulnerabilityAlerts": {
+    "labels": ["security"],
+    "assignees": ["@iturgut"],
+    "reviewers": ["@iturgut"]
+  },
+  "lockFileMaintenance": {
+    "enabled": true,
+    "schedule": ["before 10am on the first day of the month"]
+  },
+  "ignoreDeps": [],
+  "ignorePaths": [
+    "**/node_modules/**",
+    "**/dist/**",
+    "**/build/**",
+    "**/__pycache__/**"
+  ]
+}
