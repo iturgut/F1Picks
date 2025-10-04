@@ -45,31 +45,27 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
+      # Node.js dependency scanning
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
           node-version: '18'
 
-      - name: Setup Python
-        uses: actions/setup-python@v4
-        with:
-          python-version: '3.9'
-
-      - name: Install dependencies
+      - name: Install Node dependencies
         run: |
           npm ci
           cd frontend && npm ci
-          cd ../backend && pip install -r requirements.txt
 
       - name: Run npm audit
         run: |
           npm audit --audit-level moderate
           cd frontend && npm audit --audit-level moderate
 
-      - name: Run Python safety scan
-        run: |
-          pip install safety
-          cd backend && safety scan
+      # Python dependency scanning with Safety CLI
+      - name: Run Safety CLI to check for vulnerabilities
+        uses: pyupio/safety-action@v1
+        with:
+          api-key: ${{ secrets.SAFETY_API_KEY }}
 
   # Container security scan
   container-scan:
