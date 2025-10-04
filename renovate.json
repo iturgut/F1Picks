@@ -32,44 +32,44 @@
     {
       "description": "Frontend dependencies",
       "matchPaths": ["frontend/**"],
-      "semanticCommitType": "deps",
-      "semanticCommitScope": "frontend",
+      "semanticCommitType": "chore",
+      "semanticCommitScope": "deps",
       "labels": ["dependencies", "frontend"]
     },
     {
       "description": "Backend dependencies",
       "matchPaths": ["backend/**"],
-      "semanticCommitType": "deps",
-      "semanticCommitScope": "backend",
+      "semanticCommitType": "chore",
+      "semanticCommitScope": "deps",
       "labels": ["dependencies", "backend"]
     },
     {
       "description": "Shared dependencies",
       "matchPaths": ["shared/**"],
-      "semanticCommitType": "deps",
-      "semanticCommitScope": "shared",
+      "semanticCommitType": "chore",
+      "semanticCommitScope": "deps",
       "labels": ["dependencies", "shared"]
     },
     {
       "description": "Root dependencies",
       "matchPaths": ["package.json"],
-      "semanticCommitType": "deps",
-      "semanticCommitScope": "root",
+      "semanticCommitType": "chore",
+      "semanticCommitScope": "deps",
       "labels": ["dependencies", "root"]
     },
     {
       "description": "GitHub Actions",
       "matchManagers": ["github-actions"],
-      "semanticCommitType": "deps",
-      "semanticCommitScope": "actions",
+      "semanticCommitType": "ci",
+      "semanticCommitScope": "deps",
       "labels": ["dependencies", "github-actions"],
       "pinDigests": true
     },
     {
       "description": "Docker images",
       "matchManagers": ["dockerfile", "docker-compose"],
-      "semanticCommitType": "deps",
-      "semanticCommitScope": "docker",
+      "semanticCommitType": "chore",
+      "semanticCommitScope": "deps",
       "labels": ["dependencies", "docker"],
       "pinDigests": true
     },
