@@ -1,7 +1,7 @@
 {
   "buildCommand": "cd .. && npm run build:frontend",
   "outputDirectory": ".next",
-  "installCommand": "cd .. && npm ci && cd frontend && npm ci",
+  "installCommand": "cd .. && npm install && cd frontend && npm install",
   "framework": "nextjs",
   "functions": {
     "app/api/**/*.js": {
