@@ -82,7 +82,7 @@ jobs:
             frontend/package-lock.json
 
       - name: Install root dependencies
-        run: npm ci
+        run: npm ci --include=optional
         working-directory: ./
 
       - name: Build shared package
@@ -92,7 +92,7 @@ jobs:
           npm run build
 
       - name: Install frontend dependencies
-        run: npm ci
+        run: npm ci --include=optional
 
       - name: Run ESLint
         run: npm run lint
