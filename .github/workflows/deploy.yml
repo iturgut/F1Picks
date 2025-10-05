@@ -5,9 +5,12 @@ on:
     branches: [ main ]
   workflow_dispatch:
 
+# This workflow only runs on pushes to main (via merged PRs)
+# Direct pushes to main should be blocked by branch protection rules
+
 env:
   NODE_VERSION: '18'
-  PYTHON_VERSION: '3.9'
+  PYTHON_VERSION: '3.13'
 
 jobs:
   # Deploy Frontend to Vercel

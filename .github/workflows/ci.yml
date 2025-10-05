@@ -1,14 +1,15 @@
 name: CI/CD Pipeline
 
 on:
-  push:
-    branches: [ main, develop ]
   pull_request:
-    branches: [ main, develop ]
+    branches: [ main ]
+
+# This workflow runs on PRs to main for testing and validation
+# Does NOT deploy - deployment happens via deploy.yml after PR merge
 
 env:
   NODE_VERSION: '18'
-  PYTHON_VERSION: '3.9'
+  PYTHON_VERSION: '3.13'
 
 jobs:
   # Lint commit messages for conventional commits (required for release-please)

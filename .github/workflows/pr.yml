@@ -2,7 +2,7 @@ name: Pull Request Checks
 
 on:
   pull_request:
-    branches: [ main, develop ]
+    branches: [ main ]
 
 jobs:
   # Lint commit messages for conventional commits (required for release-please)
