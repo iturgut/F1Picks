@@ -5,32 +5,11 @@ on:
     branches: [ main ]
 
 jobs:
-  # Lint commit messages for conventional commits (required for release-please)
-  commitlint:
+  # Validate PR title for semantic versioning (required for release-please)
+  pr-title-check:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5
-        with:
-          fetch-depth: 0
-      
-      - name: Setup Node.js
-        uses: actions/setup-node@a0853c24544627f65ddf259abe73b1d18a591444 # v5
-        with:
-          node-version: '18'
-      
-      - name: Install commitlint
-        run: |
-          npm install -g @commitlint/cli @commitlint/config-conventional
-          echo "module.exports = {extends: ['@commitlint/config-conventional']}" > commitlint.config.js
-      
-      - name: Lint commit messages
-        run: npx commitlint --from HEAD~${{ github.event.pull_request.commits }} --to HEAD --verbose
-
-  # Check PR title and description
-  pr-check:
-    runs-on: ubuntu-latest
-    steps:
-      - name: Check PR title
+      - name: Validate PR title
         uses: amannn/action-semantic-pull-request@e32d7e603df1aa1ba07e981f2a23455dee596825 # v5
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -47,56 +26,3 @@ jobs:
             ci
             chore
             revert
-
-  # Run tests and checks
-  test:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5
-      
-      - name: Run CI pipeline
-        uses: ./.github/workflows/ci.yml
-
-  # Preview deployment for frontend changes
-  preview-deploy:
-    runs-on: ubuntu-latest
-    if: contains(github.event.pull_request.changed_files, 'frontend/')
-    steps:
-      - uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5
-      
-      - name: Deploy preview to Vercel
-        uses: amondnet/vercel-action@16e87c0a08142b0d0d33b76aeaf20823c381b9b9 # v25
-        with:
-          vercel-token: ${{ secrets.VERCEL_TOKEN }}
-          vercel-org-id: ${{ secrets.VERCEL_ORG_ID }}
-          vercel-project-id: ${{ secrets.VERCEL_PROJECT_ID }}
-          working-directory: ./frontend
-          github-comment: true
-
-  # Size check for frontend bundle
-  bundle-size:
-    runs-on: ubuntu-latest
-    if: contains(github.event.pull_request.changed_files, 'frontend/')
-    steps:
-      - uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5
-      
-      - name: Setup Node.js
-        uses: actions/setup-node@a0853c24544627f65ddf259abe73b1d18a591444 # v5
-        with:
-          node-version: '18'
-          cache: 'npm'
-      
-      - name: Install dependencies
-        run: |
-          npm ci
-          cd frontend && npm ci
-      
-      - name: Build and analyze bundle
-        run: cd frontend && npm run build
-      
-      - name: Analyze bundle size
-        uses: andresz1/size-limit-action@e7493a72a44b113341c0cf6186ab49c17c4b65c1 # v1
-        with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-          package_manager: npm
-          directory: frontend

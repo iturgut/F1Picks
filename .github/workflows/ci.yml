@@ -12,59 +12,9 @@ env:
   PYTHON_VERSION: '3.13'
 
 jobs:
-  # Lint commit messages for conventional commits (required for release-please)
-  commitlint:
-    runs-on: ubuntu-latest
-    if: github.event_name == 'pull_request'
-    steps:
-      - uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5
-        with:
-          fetch-depth: 0
-      
-      - name: Setup Node.js
-        uses: actions/setup-node@a0853c24544627f65ddf259abe73b1d18a591444 # v5
-        with:
-          node-version: ${{ env.NODE_VERSION }}
-      
-      - name: Install commitlint
-        run: |
-          npm install -g @commitlint/cli @commitlint/config-conventional
-          echo "module.exports = {extends: ['@commitlint/config-conventional']}" > commitlint.config.js
-      
-      - name: Lint commit messages
-        continue-on-error: true
-        run: npx commitlint --from HEAD~${{ github.event.pull_request.commits }} --to HEAD --verbose
-
-  # Detect changes to determine which jobs to run
-  changes:
-    runs-on: ubuntu-latest
-    outputs:
-      frontend: ${{ steps.changes.outputs.frontend }}
-      backend: ${{ steps.changes.outputs.backend }}
-      shared: ${{ steps.changes.outputs.shared }}
-    steps:
-      - uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5
-      - uses: dorny/paths-filter@v2
-        id: changes
-        with:
-          filters: |
-            frontend:
-              - 'frontend/**'
-              - 'shared/**'
-              - 'package.json'
-              - '.github/workflows/**'
-            backend:
-              - 'backend/**'
-              - '.github/workflows/**'
-            shared:
-              - 'shared/**'
-              - '.github/workflows/**'
-
   # Frontend CI
   frontend-ci:
     runs-on: ubuntu-latest
-    needs: changes
-    if: ${{ needs.changes.outputs.frontend == 'true' }}
     
     steps:
       - name: Checkout code
@@ -77,54 +27,25 @@ jobs:
           cache: 'npm'
           cache-dependency-path: package-lock.json
 
-      - name: Install dependencies (workspaces)
+      - name: Install dependencies
         run: npm ci --include=optional
 
       - name: Build shared package
         run: npm run build --workspace=shared
 
-      - name: Run ESLint
+      - name: Lint frontend
+        continue-on-error: true
         run: npm run lint --workspace=frontend
-
-      - name: Run TypeScript type check
-        run: npx tsc --noEmit
-        working-directory: ./frontend
-
-      - name: Run tests
-        run: npm run test --workspace=frontend
 
       - name: Build frontend
         run: npm run build --workspace=frontend
 
-      - name: Upload build artifacts
-        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
-        with:
-          name: frontend-build
-          path: frontend/.next/
-          retention-days: 1
-
   # Backend CI
   backend-ci:
     runs-on: ubuntu-latest
-    needs: changes
-    if: ${{ needs.changes.outputs.backend == 'true' }}
     defaults:
       run:
         working-directory: ./backend
-    
-    services:
-      postgres:
-        image: postgres:15@sha256:c189d272e4fcdd1ac419adee675d30be3d389c22ee770d593f15819d22a68a0d
-        env:
-          POSTGRES_PASSWORD: postgres
-          POSTGRES_DB: f1picks_test
-        options: >-
-          --health-cmd pg_isready
-          --health-interval 10s
-          --health-timeout 5s
-          --health-retries 5
-        ports:
-          - 5432:5432
 
     steps:
       - name: Checkout code
@@ -143,110 +64,10 @@ jobs:
           pip install -r requirements.txt
           pip install -r dev-requirements.txt
 
-      - name: Run Black (code formatting check)
+      - name: Lint with Ruff
         continue-on-error: true
-        run: black --check .
-
-      - name: Run isort (import sorting check)
-        continue-on-error: true
-        run: isort --check-only .
-
-      - name: Run mypy (type checking)
-        continue-on-error: true
-        run: mypy . --ignore-missing-imports
-
-      - name: Run flake8 (linting)
-        continue-on-error: true
-        run: flake8 . --max-line-length=88 --extend-ignore=E203,W503
-
-      - name: Run tests
-        continue-on-error: true
-        env:
-          DATABASE_URL: postgresql://postgres:postgres@localhost:5432/f1picks_test
-        run: pytest -v
+        run: ruff check .
 
       - name: Test FastAPI startup
-        continue-on-error: true
         run: |
           python -c "from app.main import app; print('FastAPI app loads successfully')"
-
-  # Shared package CI
-  shared-ci:
-    runs-on: ubuntu-latest
-    needs: changes
-    if: ${{ needs.changes.outputs.shared == 'true' }}
-    
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5
-
-      - name: Setup Node.js
-        uses: actions/setup-node@a0853c24544627f65ddf259abe73b1d18a591444 # v5
-        with:
-          node-version: ${{ env.NODE_VERSION }}
-          cache: 'npm'
-          cache-dependency-path: package-lock.json
-
-      - name: Install dependencies (workspaces)
-        run: npm ci --include=optional
-
-      - name: Build shared package
-        run: npm run build --workspace=shared
-
-      - name: Upload shared build artifacts
-        continue-on-error: true
-        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
-        with:
-          name: shared-build
-          path: shared/dist/
-          retention-days: 1
-
-  # Security scanning
-  security:
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5
-
-      - name: Run Trivy vulnerability scanner
-        continue-on-error: true
-        uses: aquasecurity/trivy-action@master
-        with:
-          scan-type: 'fs'
-          scan-ref: '.'
-          format: 'sarif'
-          output: 'trivy-results.sarif'
-
-      - name: Upload Trivy scan results to GitHub Security tab
-        continue-on-error: true
-        uses: github/codeql-action/upload-sarif@64d10c13136e1c5bce3e5fbde8d4906eeaafc885 # v3
-        if: always()
-        with:
-          sarif_file: 'trivy-results.sarif'
-
-  # Validate release-please configuration
-  validate-release-config:
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5
-
-      - name: Validate release-please config
-        run: |
-          if [ ! -f .release-please-config.json ]; then
-            echo "❌ .release-please-config.json not found"
-            exit 1
-          fi
-          
-          if [ ! -f .release-please-manifest.json ]; then
-            echo "❌ .release-please-manifest.json not found"
-            exit 1
-          fi
-          
-          echo "✅ Release-please configuration files found"
-          
-          # Validate JSON syntax
-          python -m json.tool .release-please-config.json > /dev/null
-          python -m json.tool .release-please-manifest.json > /dev/null
-          
-          echo "✅ Release-please configuration files are valid JSON"

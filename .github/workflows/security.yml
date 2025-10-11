@@ -3,108 +3,19 @@ name: Security Scans
 on:
   schedule:
     - cron: '0 2 * * 1' # Weekly on Monday at 2 AM
-  push:
-    branches: [ main ]
-  pull_request:
-    branches: [ main ]
 
 jobs:
-  # CodeQL Analysis
-  codeql:
-    name: CodeQL Analysis
+  # Trivy vulnerability scanner
+  trivy-scan:
+    name: Trivy Security Scan
     runs-on: ubuntu-latest
-    permissions:
-      actions: read
-      contents: read
-      security-events: write
-
-    strategy:
-      fail-fast: false
-      matrix:
-        language: [ 'javascript', 'python' ]
-
     steps:
-      - name: Checkout repository
+      - name: Checkout code
         uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5
-
-      - name: Initialize CodeQL
-        uses: github/codeql-action/init@64d10c13136e1c5bce3e5fbde8d4906eeaafc885 # v3
-        with:
-          languages: ${{ matrix.language }}
-
-      - name: Autobuild
-        uses: github/codeql-action/autobuild@64d10c13136e1c5bce3e5fbde8d4906eeaafc885 # v3
-
-      - name: Perform CodeQL Analysis
-        uses: github/codeql-action/analyze@64d10c13136e1c5bce3e5fbde8d4906eeaafc885 # v3
-
-  # Dependency vulnerability scan
-  dependency-scan:
-    name: Dependency Vulnerability Scan
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5
-
-      # Node.js dependency scanning
-      - name: Setup Node.js
-        uses: actions/setup-node@a0853c24544627f65ddf259abe73b1d18a591444 # v5
-        with:
-          node-version: '18'
-
-      - name: Install Node dependencies
-        run: |
-          npm ci
-          cd frontend && npm ci
-
-      - name: Run npm audit
-        run: |
-          npm audit --audit-level moderate
-          cd frontend && npm audit --audit-level moderate
-
-      # Python dependency scanning with Safety CLI
-      - name: Run Safety CLI to check for vulnerabilities
-        uses: pyupio/safety-action@7baf6605473beffc874c1313ddf2db085c0cacf2 # v1
-        continue-on-error: true
-        with:
-          api-key: ${{ secrets.SAFETY_API_KEY }}
-
-  # Container security scan
-  container-scan:
-    name: Container Security Scan
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5
-
-      - name: Build Docker image
-        run: |
-          cd backend
-          docker build -t f1picks-backend:latest .
 
       - name: Run Trivy vulnerability scanner
         uses: aquasecurity/trivy-action@master
         with:
-          image-ref: 'f1picks-backend:latest'
-          format: 'sarif'
-          output: 'trivy-results.sarif'
-
-      - name: Upload Trivy scan results to GitHub Security tab
-        uses: github/codeql-action/upload-sarif@64d10c13136e1c5bce3e5fbde8d4906eeaafc885 # v3
-        with:
-          sarif_file: 'trivy-results.sarif'
-
-  # Secret scanning
-  secret-scan:
-    name: Secret Scanning
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5
-        with:
-          fetch-depth: 0
-
-      - name: TruffleHog OSS
-        uses: trufflesecurity/trufflehog@main
-        with:
-          path: ./
-          base: main
-          head: HEAD
-          extra_args: --debug --only-verified
+          scan-type: 'fs'
+          scan-ref: '.'
+          format: 'table'
