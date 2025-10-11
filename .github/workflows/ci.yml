@@ -28,7 +28,9 @@ jobs:
           cache-dependency-path: package-lock.json
 
       - name: Install dependencies
-        run: npm ci --workspaces
+        run: |
+          npm ci
+          npm ci --workspace=frontend --workspace=shared
 
       - name: Build shared package
         run: npm run build --workspace=shared
