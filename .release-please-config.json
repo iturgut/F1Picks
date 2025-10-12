@@ -6,39 +6,32 @@
       "package-name": "f1-picks",
       "changelog-path": "CHANGELOG.md",
       "bump-minor-pre-major": true,
-      "bump-patch-for-minor-pre-major": true
-    },
-    "frontend": {
-      "release-type": "node",
-      "package-name": "@f1picks/frontend",
-      "changelog-path": "CHANGELOG.md",
-      "bump-minor-pre-major": true,
-      "bump-patch-for-minor-pre-major": true
-    },
-    "backend": {
-      "release-type": "python",
-      "package-name": "f1picks-backend",
-      "changelog-path": "CHANGELOG.md",
-      "bump-minor-pre-major": true,
-      "bump-patch-for-minor-pre-major": true
-    },
-    "shared": {
-      "release-type": "node",
-      "package-name": "@f1picks/shared",
-      "changelog-path": "CHANGELOG.md",
-      "bump-minor-pre-major": true,
-      "bump-patch-for-minor-pre-major": true
+      "bump-patch-for-minor-pre-major": true,
+      "extra-files": [
+        "frontend/package.json",
+        "backend/package.json",
+        "shared/package.json",
+        "backend/version.py"
+      ]
     }
   },
   "plugins": [
     {
       "type": "node-workspace",
-      "merge": false
+      "merge": true
+    },
+    {
+      "type": "linked-versions",
+      "groupName": "f1picks-monorepo",
+      "components": [
+        "frontend",
+        "backend",
+        "shared"
+      ]
     }
   ],
   "group-pull-request-title-pattern": "chore: release ${version}",
   "separate-pull-requests": false,
-  "tag-separator": "-",
   "include-v-in-tag": true,
   "changelog-sections": [
     {"type": "feat", "section": "Features"},
