@@ -1,4 +1,4 @@
-name: Deploy to Production
+name: Deploy
 
 on:
   push:
@@ -20,8 +20,9 @@ jobs:
       - name: Setup Fly CLI
         uses: superfly/flyctl-actions/setup-flyctl@master
 
+      - name: Authenticate with Fly.io
+        run: echo "${{ secrets.FLY_API_TOKEN }}" | flyctl auth token
+        
       - name: Deploy to Fly.io
         run: flyctl deploy --remote-only
         working-directory: ./backend
-        env:
-          FLY_API_TOKEN: ${{ secrets.FLY_API_TOKEN }}
