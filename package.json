@@ -1,7 +1,7 @@
 {
   "name": "f1-picks",
   "version": "0.1.0",
-  "description": "F1 prediction game with real-time scoring",
+  "description": "F1 prediction game with scoring",
   "private": true,
   "workspaces": [
     "frontend",
@@ -16,7 +16,10 @@
     "format:backend": "cd backend && ruff check --fix . && ruff format ."
   },
   "devDependencies": {
-    "concurrently": "^8.2.2"
+    "autoprefixer": "^10.4.21",
+    "concurrently": "^8.2.2",
+    "postcss": "^8.5.6",
+    "tailwindcss": "^3.4.18"
   },
   "engines": {
     "node": ">=18.0.0",
