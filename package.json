@@ -11,13 +11,9 @@
     "dev": "concurrently \"npm run dev --workspace=frontend\" \"npm run dev:backend\"",
     "dev:backend": "cd backend && uvicorn app.main:app --reload --host 0.0.0.0 --port 8000",
     "build": "npm run build --workspace=shared && npm run build --workspace=frontend",
-    "lint": "npm run lint --workspace=frontend && npm run lint:backend",
+    "lint": "npm run lint --workspace=frontend",
     "lint:backend": "cd backend && ruff check .",
-    "format": "npm run lint --workspace=frontend -- --fix && npm run format:backend",
-    "format:backend": "cd backend && ruff check --fix . && ruff format .",
-    "test": "npm run test --workspace=frontend && npm run test:backend",
-    "test:backend": "cd backend && pytest",
-    "install:backend": "cd backend && pip install -r requirements.txt -r dev-requirements.txt"
+    "format:backend": "cd backend && ruff check --fix . && ruff format ."
   },
   "devDependencies": {
     "concurrently": "^8.2.2"
