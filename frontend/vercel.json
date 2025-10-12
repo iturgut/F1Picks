@@ -1,18 +1,8 @@
 {
-  "buildCommand": "cd .. && npm run build:frontend",
+  "buildCommand": "cd .. && npm install && npm run build --workspace=frontend",
   "outputDirectory": ".next",
-  "installCommand": "cd .. && npm ci && cd frontend && npm ci",
+  "installCommand": "npm install --include=optional",
   "framework": "nextjs",
-  "env": {
-    "NEXT_PUBLIC_API_URL": "@api_url",
-    "NEXT_PUBLIC_APP_ENV": "@app_env"
-  },
-  "build": {
-    "env": {
-      "NEXT_PUBLIC_API_URL": "@api_url",
-      "NEXT_PUBLIC_APP_ENV": "@app_env"
-    }
-  },
   "functions": {
     "app/api/**/*.js": {
       "maxDuration": 30
