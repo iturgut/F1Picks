@@ -15,29 +15,31 @@ A free-to-play prediction web app for Formula 1 fans who want to compete sociall
 
 This is a monorepo containing:
 
-- **Frontend** (`/frontend`): Next.js with TypeScript and Tailwind CSS
-- **Backend** (`/backend`): FastAPI with Python 3.9+
+- **Frontend** (`/frontend`): Next.js 15 with TypeScript and Tailwind CSS
+- **Backend** (`/backend`): FastAPI with Python 3.13
 - **Shared** (`/shared`): Common utilities, types, and configurations
 - **Worker**: Python worker for FastF1 data ingestion (post-session)
 
 ### Tech Stack
 
-- **Frontend**: Next.js, TypeScript, Tailwind CSS, React
-- **Backend**: FastAPI, SQLAlchemy, Alembic, asyncpg
+- **Frontend**: Next.js 15, React 19, TypeScript 5, Tailwind CSS
+- **Backend**: FastAPI, SQLAlchemy, Alembic, asyncpg, Python 3.13
 - **Database**: PostgreSQL
 - **Data Source**: FastF1 library for F1 telemetry and results
-- **Authentication**: Firebase (email/password, Google/Apple)
-- **Deployment**: Vercel (frontend), Fly.io (backend + workers)
-- **CI/CD**: GitHub Actions
+- **Authentication**: Supabase (email/password, OAuth)
+- **Deployment**: Vercel (frontend), Fly.io (backend)
+- **CI/CD**: GitHub Actions with Release Please
+- **Containerization**: Docker (backend)
 
 ## 🚀 Quick Start
 
 ### Prerequisites
 
 - Node.js 18+ and npm 9+
-- Python 3.9+
+- Python 3.13+
 - PostgreSQL
 - Git
+- Docker (optional, for containerized development)
 
 ### Installation
 
@@ -49,11 +51,14 @@ This is a monorepo containing:
 
 2. **Install dependencies**
    ```bash
-   # Install root dependencies
-   npm install
+   # Install all workspace dependencies
+   npm ci --include-workspace-root
    
    # Install backend dependencies
-   npm run install:backend
+   cd backend
+   pip install -r requirements.txt
+   pip install -r dev-requirements.txt
+   cd ..
    ```
 
 3. **Environment Setup**
@@ -116,26 +121,45 @@ F1Picks/
 ### Available Scripts
 
 - `npm run dev` - Start both frontend and backend in development mode
-- `npm run build` - Build the frontend for production
-- `npm run lint` - Run linting for both frontend and backend
-- `npm run format` - Format code for both frontend and backend
-- `npm run test` - Run tests for both frontend and backend
+- `npm run build` - Build shared package and frontend for production
+- `npm run lint` - Run ESLint on frontend
+- `npm run lint:backend` - Run Ruff linting on backend
+- `npm run format:backend` - Format backend code with Ruff
 
 ### Code Quality
 
-- **Frontend**: ESLint, Prettier, TypeScript
-- **Backend**: Black, isort, mypy, flake8
-- **Pre-commit hooks**: Automated formatting and linting
+- **Frontend**: ESLint, TypeScript
+- **Backend**: Ruff (linting and formatting)
+- **CI/CD**: Automated testing on PRs, deployment on merge to main
 
 ## 🚢 Deployment
 
+### CI/CD Pipeline
+
+The project uses a multi-workflow GitHub Actions setup:
+
+1. **CI Pipeline** (`ci.yml`) - Runs on PRs to `main`
+   - Frontend: Lint, build, and validate
+   - Backend: Lint with Ruff, test FastAPI startup
+   - Does NOT deploy
+
+2. **Deploy** (`deploy.yml`) - Runs on merge to `main`
+   - Deploys backend to Fly.io using Docker
+   - Frontend deploys automatically via Vercel GitHub integration
+
+3. **Release Please** (`release-please.yml`) - Automated versioning
+   - Creates release PRs with changelog generation
+   - Bumps versions across all workspace packages
+   - Follows Conventional Commits specification
+
 ### Frontend (Vercel)
-- Automatic deployment from `main` branch
+- Automatic deployment from `main` branch via Vercel GitHub integration
 - Environment variables configured in Vercel dashboard
 
 ### Backend (Fly.io)
-- Deployed using `fly.toml` configuration
-- Database and environment variables configured via Fly.io
+- Deployed using `fly.toml` configuration and Dockerfile
+- Triggered by `deploy.yml` workflow on merge to `main`
+- Database and environment variables configured via Fly.io secrets
 
 ## 🧪 Testing
 
@@ -151,6 +175,9 @@ cd backend
 pytest
 ```
 
+### CI/CD Testing
+All tests run automatically on pull requests via GitHub Actions.
+
 ## 📊 Data Flow
 
 1. **Schedule Ingestion**: Worker fetches F1 schedule from FastF1
@@ -164,9 +191,15 @@ pytest
 
 1. Fork the repository
 2. Create a feature branch (`git checkout -b feature/amazing-feature`)
-3. Commit your changes (`git commit -m 'Add amazing feature'`)
+3. Commit your changes using [Conventional Commits](https://www.conventionalcommits.org/)
+   - `feat:` for new features
+   - `fix:` for bug fixes
+   - `docs:` for documentation changes
+   - `chore:` for maintenance tasks
 4. Push to the branch (`git push origin feature/amazing-feature`)
 5. Open a Pull Request
+6. CI pipeline will automatically run tests and validation
+7. After merge, Release Please will handle versioning and changelog generation
 
 ## 📝 License
 
