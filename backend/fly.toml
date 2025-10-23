@@ -13,6 +13,7 @@ primary_region = 'sjc'
 
 [env]
   PORT = '8000'
+  # Database URL will be set via secrets
 
 [processes]
   app = 'uvicorn app.main:app --host 0.0.0.0 --port 8000'
