@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.1.2](https://github.com/iturgut/F1Picks/compare/f1-picks-v0.1.1...f1-picks-v0.1.2) (2025-10-23)
+
+
+### Bug Fixes
+
+* Update releases ([#49](https://github.com/iturgut/F1Picks/issues/49)) ([dfe8f67](https://github.com/iturgut/F1Picks/commit/dfe8f67e767054313798a1dc460bb38a85ccab97))
+
 ## [0.1.1](https://github.com/iturgut/F1Picks/compare/f1-picks-v0.1.0...f1-picks-v0.1.1) (2025-10-15)
 
 
