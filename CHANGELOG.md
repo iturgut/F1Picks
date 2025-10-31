@@ -1,5 +1,13 @@
 # Changelog
 
+## [0.1.4](https://github.com/iturgut/F1Picks/compare/f1-picks-v0.1.3...f1-picks-v0.1.4) (2025-10-31)
+
+
+### Features
+
+* implement complete database schema and migration system ([#65](https://github.com/iturgut/F1Picks/issues/65)) ([74a4f41](https://github.com/iturgut/F1Picks/commit/74a4f411b61e3973dc741d5dfddd5a1871109fa3))
+* implement complete database schema and migration system ([#67](https://github.com/iturgut/F1Picks/issues/67)) ([1068b7a](https://github.com/iturgut/F1Picks/commit/1068b7a6dff3cfbeaa74ba34448648d96891c0d4))
+
 ## [0.1.3](https://github.com/iturgut/F1Picks/compare/f1-picks-v0.1.2...f1-picks-v0.1.3) (2025-10-31)
 
 
