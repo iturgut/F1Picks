@@ -71,3 +71,12 @@ jobs:
       - name: Test FastAPI startup
         run: |
           python -c "from app.main import app; print('FastAPI app loads successfully')"
+
+      - name: Check Alembic migrations
+        run: |
+          # Validate migration syntax and structure
+          python -m alembic show head
+          # Check migration history
+          python -m alembic history --verbose
+          # Validate that models can be imported
+          python -c "from app.models import Base; print('✅ Models import successfully')"
