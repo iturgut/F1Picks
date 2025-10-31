@@ -102,4 +102,7 @@ Thumbs.db
 
 # Task files
 # tasks.json
-# tasks/ 
+# tasks/
+
+# Error logs and debugging files
+errors/ 
