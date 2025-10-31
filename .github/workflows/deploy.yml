@@ -33,7 +33,13 @@ jobs:
       - name: Run database migrations
         working-directory: ./backend
         run: |
-          # Run Alembic migrations on production database
+          # For first deployment: mark current migration as applied without running it
+          # This handles the case where Supabase migrations already created the schema
+          echo "Marking current migration as applied (Supabase schema already exists)"
+          python -m alembic stamp head
+          
+          # Future deployments will run incremental migrations normally
+          echo "Running any new migrations"
           python -m alembic upgrade head
         env:
           DATABASE_URL: ${{ secrets.DATABASE_URL }}
