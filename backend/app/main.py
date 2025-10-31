@@ -1,6 +1,10 @@
-from fastapi import FastAPI
-from fastapi.middleware.cors import CORSMiddleware
 import os
+
+from fastapi import Depends, FastAPI
+from fastapi.middleware.cors import CORSMiddleware
+from sqlalchemy.ext.asyncio import AsyncSession
+
+from .database import get_db
 
 app = FastAPI(
     title="F1 Picks API",
@@ -32,4 +36,28 @@ async def root():
 
 @app.get("/health")
 async def health_check():
-    return {"status": "healthy"}
+    """Health check endpoint."""
+    return {
+        "status": "healthy",
+        "version": "1.0.0"
+    }
+
+@app.get("/health/db")
+async def health_check_db():
+    """Health check endpoint that also verifies database connectivity."""
+    try:
+        # Test database connectivity without dependency injection
+        from app.database import get_db_session
+        from sqlalchemy import text
+        
+        async with get_db_session() as session:
+            result = await session.execute(text("SELECT 1"))
+            db_status = "connected" if result else "disconnected"
+    except Exception as e:
+        db_status = f"error: {str(e)}"
+    
+    return {
+        "status": "healthy",
+        "database": db_status,
+        "version": "1.0.0"
+    }
