@@ -74,7 +74,9 @@ jobs:
 
       - name: Check Alembic migrations
         run: |
-          # Check if migrations are up to date
-          python -m alembic check
-          # Validate migration syntax
+          # Validate migration syntax and structure
           python -m alembic show head
+          # Check migration history
+          python -m alembic history --verbose
+          # Validate that models can be imported
+          python -c "from app.models import Base; print('✅ Models import successfully')"

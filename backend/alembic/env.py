@@ -17,6 +17,10 @@ config = context.config
 database_url = os.getenv("DATABASE_URL")
 if database_url:
     config.set_main_option("sqlalchemy.url", database_url)
+else:
+    # For CI environments without DATABASE_URL, use a dummy URL for syntax checking
+    # This allows migration validation without requiring a real database connection
+    config.set_main_option("sqlalchemy.url", "postgresql+asyncpg://user:pass@localhost/dummy")
 
 # Interpret the config file for Python logging.
 # This line sets up loggers basically.
