@@ -1,5 +1,19 @@
 # Changelog
 
+## [0.1.3](https://github.com/iturgut/F1Picks/compare/f1-picks-v0.1.2...f1-picks-v0.1.3) (2025-10-31)
+
+
+### Features
+
+* implement complete database schema and migration system ([#64](https://github.com/iturgut/F1Picks/issues/64)) ([6c9ec85](https://github.com/iturgut/F1Picks/commit/6c9ec853e41da74ff1fda55c100c3c64e02a5a03))
+
+
+### Bug Fixes
+
+* Configure Fly.io deployment with proper database and CORS settings ([ea3b4a5](https://github.com/iturgut/F1Picks/commit/ea3b4a5ab5c772befa5dbf86034fe41a4185f16a))
+* Configure Fly.io deployment with proper database and CORS settings ([#59](https://github.com/iturgut/F1Picks/issues/59)) ([cd9c6fc](https://github.com/iturgut/F1Picks/commit/cd9c6fca377ddf76ab4e47f0128c922b6b8871ca))
+* Configure Fly.io deployment with proper database and CORS settings ([#61](https://github.com/iturgut/F1Picks/issues/61)) ([a424e39](https://github.com/iturgut/F1Picks/commit/a424e394e3d9b3a980a577fe5e0208c59127fe08))
+
 ## [0.1.2](https://github.com/iturgut/F1Picks/compare/f1-picks-v0.1.1...f1-picks-v0.1.2) (2025-10-23)
 
 
