@@ -8,7 +8,7 @@ on:
 # Does NOT deploy - deployment happens via deploy.yml after PR merge
 
 env:
-  NODE_VERSION: '18'
+  NODE_VERSION: '20.10.0'
   PYTHON_VERSION: '3.13'
 
 jobs:
