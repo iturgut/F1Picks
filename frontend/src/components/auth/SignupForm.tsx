@@ -45,8 +45,8 @@ export function SignupForm() {
       setSuccess(true)
       // Redirect after 2 seconds
       setTimeout(() => router.push('/'), 2000)
-    } catch (err: any) {
-      setError(err.message || 'Failed to create account')
+    } catch (err) {
+      setError((err as Error).message || 'Failed to create account')
     } finally {
       setLoading(false)
     }
@@ -58,8 +58,8 @@ export function SignupForm() {
 
     try {
       await signInWithGoogle()
-    } catch (err: any) {
-      const errorMessage = err.message || 'Failed to sign in with Google'
+    } catch (err) {
+      const errorMessage = (err as Error).message || 'Failed to sign in with Google'
       if (errorMessage.includes('provider is not enabled')) {
         setError('Google sign-in is not configured yet. Please use email/password.')
       } else {

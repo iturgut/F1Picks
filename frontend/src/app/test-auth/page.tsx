@@ -24,8 +24,8 @@ export default function TestAuthPage() {
     try {
       await signIn(email, password)
       setSuccess('Signed in successfully!')
-    } catch (err: any) {
-      setError(err.message)
+    } catch (err) {
+      setError((err as Error).message)
     }
   }
 
@@ -36,8 +36,8 @@ export default function TestAuthPage() {
     try {
       await signUp(email, password)
       setSuccess('Signed up successfully! Check your email for confirmation.')
-    } catch (err: any) {
-      setError(err.message)
+    } catch (err) {
+      setError((err as Error).message)
     }
   }
 
@@ -47,8 +47,8 @@ export default function TestAuthPage() {
     try {
       await signOut()
       setSuccess('Signed out successfully!')
-    } catch (err: any) {
-      setError(err.message)
+    } catch (err) {
+      setError((err as Error).message)
     }
   }
 
@@ -57,8 +57,8 @@ export default function TestAuthPage() {
     setSuccess(null)
     try {
       await signInWithGoogle()
-    } catch (err: any) {
-      setError(err.message)
+    } catch (err) {
+      setError((err as Error).message)
     }
   }
 

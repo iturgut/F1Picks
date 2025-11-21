@@ -27,8 +27,8 @@ export function LoginForm() {
     try {
       await signIn(email, password)
       router.push('/')
-    } catch (err: any) {
-      setError(err.message || 'Failed to sign in')
+    } catch (err) {
+      setError((err as Error).message || 'Failed to sign in')
     } finally {
       setLoading(false)
     }
@@ -40,8 +40,8 @@ export function LoginForm() {
 
     try {
       await signInWithGoogle()
-    } catch (err: any) {
-      const errorMessage = err.message || 'Failed to sign in with Google'
+    } catch (err) {
+      const errorMessage = (err as Error).message || 'Failed to sign in with Google'
       if (errorMessage.includes('provider is not enabled')) {
         setError('Google sign-in is not configured yet. Please use email/password.')
       } else {
@@ -180,7 +180,7 @@ export function LoginForm() {
       </div>
 
       <p className="mt-10 text-center text-sm text-gray-500">
-        Don't have an account?{' '}
+        Don&apos;t have an account?{' '}
         <Link
           href="/signup"
           className="font-semibold leading-6 text-red-600 hover:text-red-500"
