@@ -71,7 +71,7 @@
             "parentId": "undefined"
           }
         ],
-        "updatedAt": "2025-09-26T03:56:27.538Z"
+        "updatedAt": "2025-11-18T22:30:00.000Z"
       },
       {
         "id": 12,
@@ -149,9 +149,9 @@
       },
       {
         "id": 13,
-        "title": "Implement Authentication System with Firebase",
-        "description": "Set up Firebase authentication for email/password and social logins (Google/Apple), and integrate it with the frontend and backend systems.",
-        "details": "1. Create Firebase project and configure authentication methods:\n   - Email/password\n   - Google OAuth\n   - Apple Sign In\n2. Implement frontend authentication components:\n   - Login form\n   - Registration form\n   - Social login buttons\n   - Password reset flow\n3. Set up Firebase SDK in Next.js frontend:\n   - Initialize Firebase app\n   - Create auth context provider\n   - Implement protected routes\n4. Create backend authentication middleware:\n   - Verify Firebase JWT tokens\n   - Extract user information\n   - Handle authorization\n5. Implement user profile creation on first login\n6. Auto-join users to global league upon registration\n7. Set up session management and token refresh\n\nExample Firebase auth integration in Next.js:\n```typescript\n// auth-context.tsx\nimport { createContext, useContext, useEffect, useState } from 'react';\nimport { getAuth, onAuthStateChanged, signInWithEmailAndPassword } from 'firebase/auth';\nimport { app } from '../firebase-config';\n\nconst AuthContext = createContext<{user: User | null, loading: boolean}>({ user: null, loading: true });\n\nexport function AuthProvider({ children }) {\n  const [user, setUser] = useState<User | null>(null);\n  const [loading, setLoading] = useState(true);\n  \n  useEffect(() => {\n    const auth = getAuth(app);\n    const unsubscribe = onAuthStateChanged(auth, (user) => {\n      setUser(user);\n      setLoading(false);\n    });\n    return unsubscribe;\n  }, []);\n  \n  return (\n    <AuthContext.Provider value={{ user, loading }}>\n      {children}\n    </AuthContext.Provider>\n  );\n}\n```",
+        "title": "Implement Authentication System with Supabase",
+        "description": "Set up Supabase authentication for email/password and social logins (Google/Apple), and integrate it with the frontend and backend systems.",
+        "details": "1. Create and configure Supabase project with authentication methods (email/password, Google OAuth, Apple Sign In)\\n2. Implement frontend authentication components (login, registration, social login, password reset)\\n3. Set up Supabase client in Next.js frontend with auth context provider and protected routes\\n4. Create backend authentication middleware to verify Supabase JWT tokens and extract user information\\n5. Implement user profile creation on first login using existing User model\\n6. Auto-join users to global league upon registration\\n7. Session management handled automatically by Supabase Auth",
         "testStrategy": "1. Test user registration flow with email/password\n2. Test social login flows with Google and Apple\n3. Verify token validation on backend API calls\n4. Test authentication error handling and user feedback\n5. Verify automatic global league joining\n6. Test session persistence and token refresh\n7. Validate protected routes redirect unauthenticated users\n8. Test password reset flow",
         "priority": "high",
         "dependencies": [
@@ -161,61 +161,61 @@
         "subtasks": [
           {
             "id": 1,
-            "title": "Create and Configure Firebase Project",
-            "description": "Set up a new Firebase project and configure the authentication methods including email/password, Google OAuth, and Apple Sign In.",
+            "title": "Create and Configure Supabase Project and Auth",
+            "description": "Set up Supabase project and configure authentication methods including email/password, Google OAuth, and Apple Sign In.",
             "dependencies": [],
-            "details": "1. Create a new Firebase project in the Firebase console\n2. Enable Authentication service in the Firebase project\n3. Configure Email/Password authentication method in Firebase console\n4. Set up Google OAuth provider with appropriate credentials\n5. Configure Apple Sign In with required certificates and keys\n6. Set up security rules for authentication\n7. Note down Firebase configuration details (apiKey, authDomain, etc.) for frontend integration",
+            "details": "1. Create a new Supabase project or use existing project from Task 11\\n2. Enable Email/Password authentication in Supabase Auth settings\\n3. Configure email templates for signup confirmation and password reset\\n4. Set up Google OAuth provider with appropriate credentials in Supabase Auth\\n5. Configure Apple Sign In with required certificates and keys in Supabase Auth\\n6. Configure redirect URLs for OAuth providers\\n7. Set up Row Level Security (RLS) policies for the users table\\n8. Note down Supabase project URL and anon key for frontend integration",
             "status": "pending",
-            "testStrategy": "Verify all authentication methods are properly enabled in Firebase console. Test each auth method manually through Firebase Authentication UI to ensure proper configuration.",
+            "testStrategy": "Verify all authentication methods are properly enabled in Supabase dashboard. Test email templates are configured correctly. Verify OAuth redirect URLs are set up properly.",
             "parentId": "undefined"
           },
           {
             "id": 2,
-            "title": "Implement Firebase SDK Integration in Next.js Frontend",
-            "description": "Set up Firebase SDK in the Next.js application, create authentication context provider, and implement authentication state management.",
+            "title": "Integrate Supabase Auth on Frontend",
+            "description": "Set up Supabase client in the Next.js application, create authentication context provider, and implement authentication state management.",
             "dependencies": [
               "13.1"
             ],
-            "details": "1. Install Firebase SDK packages: `npm install firebase firebase/auth`\n2. Create firebase-config.ts file with initialization code using the Firebase project details\n3. Implement AuthContext provider component that manages authentication state\n4. Create custom hooks for auth operations (useAuth, useSignIn, useSignOut, etc.)\n5. Set up auth state listener using onAuthStateChanged\n6. Implement token persistence and refresh logic\n7. Add protected route wrapper component that redirects unauthenticated users",
+            "details": "1. Install Supabase packages: npm install @supabase/supabase-js @supabase/auth-helpers-nextjs\\n2. Create lib/supabase.ts file with Supabase client initialization using project URL and anon key\\n3. Implement AuthContext provider component that manages authentication state with Supabase\\n4. Create custom hooks for auth operations (useAuth, useSignIn, useSignUp, useSignOut)\\n5. Set up auth state listener using supabase.auth.onAuthStateChange\\n6. Implement session management with Supabase Auth (automatic token refresh)\\n7. Add protected route wrapper component that redirects unauthenticated users\\n8. Create middleware for Next.js to handle auth state on server-side",
             "status": "pending",
-            "testStrategy": "Unit test the auth context provider and hooks. Test authentication state persistence across page refreshes. Verify protected routes correctly redirect unauthenticated users.",
+            "testStrategy": "Unit test the auth context provider and hooks. Test authentication state persistence across page refreshes. Verify protected routes correctly redirect unauthenticated users. Test session refresh works automatically.",
             "parentId": "undefined"
           },
           {
             "id": 3,
-            "title": "Build Authentication UI Components",
-            "description": "Create frontend components for user authentication including login form, registration form, social login buttons, and password reset flow.",
+            "title": "Wire Supabase Auth into Frontend Routing",
+            "description": "Implement protected pages, authentication redirects, and route guards using Supabase Auth state.",
             "dependencies": [
               "13.2"
             ],
-            "details": "1. Create LoginForm component with email/password fields and validation\n2. Implement RegistrationForm component with necessary user information fields\n3. Build SocialLoginButtons component for Google and Apple login options\n4. Create PasswordResetForm component for the forgot password flow\n5. Implement form validation using a form library (e.g., Formik, React Hook Form)\n6. Add error handling and user feedback for authentication actions\n7. Style components according to application design system\n8. Implement responsive design for mobile and desktop views",
+            "details": "1. Create LoginForm component with email/password fields and Supabase signInWithPassword\\n2. Implement RegistrationForm component with Supabase signUp\\n3. Build SocialLoginButtons component using Supabase signInWithOAuth for Google and Apple\\n4. Create PasswordResetForm component using Supabase resetPasswordForEmail\\n5. Implement form validation using React Hook Form or Zod\\n6. Add error handling for Supabase auth errors with user-friendly messages\\n7. Create protected page wrapper that checks auth state and redirects to login\\n8. Implement auth pages: /login, /signup, /reset-password\\n9. Style components with Tailwind CSS and shadcn/ui\\n10. Add loading states during authentication operations",
             "status": "pending",
-            "testStrategy": "Test form validation for all input fields. Verify error messages display correctly for invalid inputs. Test social login button functionality. Ensure responsive design works across different screen sizes.",
+            "testStrategy": "Test form validation for all input fields. Verify Supabase auth methods work correctly. Test social login redirects. Test protected routes redirect unauthenticated users to login. Ensure responsive design works across different screen sizes.",
             "parentId": "undefined"
           },
           {
             "id": 4,
-            "title": "Implement Backend Authentication Middleware",
-            "description": "Create backend middleware to verify Firebase JWT tokens, extract user information, and handle authorization for protected API routes.",
+            "title": "Implement Backend Auth Middleware in FastAPI",
+            "description": "Create FastAPI dependency that validates Supabase JWTs and exposes current_user for protected endpoints.",
             "dependencies": [
               "13.1"
             ],
-            "details": "1. Install Firebase Admin SDK in the backend service\n2. Initialize Firebase Admin with service account credentials\n3. Create authentication middleware that verifies Firebase JWT tokens\n4. Implement token extraction from request headers\n5. Add user information extraction from verified tokens\n6. Create role-based authorization middleware if needed\n7. Handle token verification errors with appropriate HTTP responses\n8. Add the middleware to protected API routes",
+            "details": "1. Install PyJWT and python-jose for JWT validation\\n2. Create auth.py module in backend/app with JWT validation logic\\n3. Fetch Supabase JWT secret from project settings (JWT Secret in API settings)\\n4. Implement get_current_user dependency that extracts Bearer token, verifies JWT signature, validates expiration, and extracts user_id (sub claim)\\n5. Create optional get_current_user_optional for endpoints that work with/without auth\\n6. Add proper error handling for invalid/expired tokens (401 Unauthorized)\\n7. Create user lookup function to get User model from database by Supabase user_id\\n8. Add the dependency to protected API routes",
             "status": "pending",
-            "testStrategy": "Test middleware with valid and invalid tokens. Verify correct user information extraction from tokens. Test authorization logic with different user roles. Ensure proper error responses for authentication failures.",
+            "testStrategy": "Test middleware with valid Supabase JWTs from frontend. Test with expired tokens. Test with invalid signatures. Verify user_id extraction works correctly. Test protected endpoints reject unauthenticated requests. Verify user lookup from database works.",
             "parentId": "undefined"
           },
           {
             "id": 5,
-            "title": "Implement User Profile and Post-Authentication Workflows",
-            "description": "Create user profile on first login, auto-join users to global league, and implement session management with token refresh.",
+            "title": "Tie Supabase User IDs to User Model and DB Schema",
+            "description": "Create user profile on first login using existing User model, auto-join users to global league, and sync Supabase auth with database.",
             "dependencies": [
               "13.2",
               "13.4"
             ],
-            "details": "1. Create database schema for user profiles\n2. Implement API endpoint to create/update user profiles\n3. Add logic to detect first-time logins and trigger profile creation\n4. Implement auto-join functionality for the global league\n5. Create session management utilities for handling token expiration\n6. Implement token refresh logic to maintain user sessions\n7. Add user profile completion check after authentication\n8. Create API endpoints for user profile management",
+            "details": "1. User model already exists from Task 11 (id as UUID, email, name, photo_url, created_at)\\n2. Create POST /api/users/me endpoint to create/update user profile\\n3. Implement frontend logic to call /api/users/me after successful Supabase signup/login\\n4. Use Supabase user.id (UUID) as the primary key in the users table\\n5. Extract user metadata (email, name, avatar_url) from Supabase JWT claims\\n6. Implement auto-join functionality: create LeagueMember record for global league on first login\\n7. Create GET /api/users/me endpoint to fetch current user profile\\n8. Add database trigger or backend logic to ensure user exists before other operations\\n9. Handle user profile updates (name, photo_url) via PUT /api/users/me\\n10. Supabase handles session management and token refresh automatically",
             "status": "pending",
-            "testStrategy": "Test user profile creation on first login. Verify users are automatically added to global league. Test session persistence and token refresh functionality. Verify user profile updates are saved correctly.",
+            "testStrategy": "Test user profile creation on first Supabase login. Verify Supabase user.id matches database users.id. Verify users are automatically added to global league. Test user profile fetch and updates. Verify email from Supabase matches database.",
             "parentId": "undefined"
           }
         ]
