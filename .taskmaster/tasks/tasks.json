@@ -9,7 +9,7 @@
         "testStrategy": "1. Verify CI/CD pipeline runs successfully on pull requests\n2. Test database migrations up and down\n3. Validate schema constraints and relationships\n4. Ensure proper indexing for query performance\n5. Write unit tests for database models and their relationships",
         "priority": "high",
         "dependencies": [],
-        "status": "in-progress",
+        "status": "done",
         "subtasks": [
           {
             "id": 1,
@@ -30,9 +30,10 @@
               "11.1"
             ],
             "details": "1. Create .github/workflows directory in the monorepo root\n2. Implement unified CI workflow with:\n   - Node.js setup for frontend\n   - Python setup for backend\n   - Dependency installation for both services\n   - Linting with ESLint (frontend) and Black/isort (backend)\n   - Type checking with TypeScript and mypy\n   - Unit tests with Jest (frontend) and pytest (backend)\n   - Build verification for both services\n3. Configure Vercel deployment for frontend subdirectory\n4. Set up Fly.io deployment for backend subdirectory\n5. Add deployment workflows triggered on main branch merges\n6. Configure environment secrets for deployments\n7. Implement path-based workflow triggers for efficient CI\n<info added on 2025-09-26T04:03:07.501Z>\n8. Implement semantic versioning with release-please:\n   - Configure release-please GitHub Action for monorepo structure\n   - Set up separate versioning for frontend and backend components\n   - Configure conventional commit parsing for automated version bumping\n   - Implement automated changelog generation based on commit history\n   - Configure release creation workflow triggered by version bump PRs\n   - Add release-please configuration file with appropriate release types\n   - Set up manifest file to track component versions\n</info added on 2025-09-26T04:03:07.501Z>",
-            "status": "pending",
+            "status": "done",
             "testStrategy": "1. Test workflows by making pull requests\n2. Verify all CI checks run successfully\n3. Test deployment to staging environments\n4. Validate secret management and environment variables",
-            "parentId": "undefined"
+            "parentId": "undefined",
+            "updatedAt": "2025-11-18T22:30:00.000Z"
           },
           {
             "id": 3,
@@ -66,7 +67,7 @@
               "11.4"
             ],
             "details": "1. Implement connection pooling with SQLAlchemy\n2. Create environment variable configuration with pydantic settings\n3. Set up .env files for local development\n4. Implement database session management\n5. Create base repository pattern for database access\n6. Implement CRUD operations for each model\n7. Add database health check endpoint\n8. Configure connection timeouts and retry logic\n9. Implement database transaction management\n10. Add logging for database operations\n11. Set up database connection for tests with test database",
-            "status": "pending",
+            "status": "done",
             "testStrategy": "1. Test connection pooling under load\n2. Verify environment variables are correctly loaded\n3. Test database session management\n4. Validate CRUD operations for each model\n5. Test health check endpoint\n6. Verify connection retry logic works",
             "parentId": "undefined"
           }
@@ -663,97 +664,9 @@
             "testStrategy": "Test export functionality with various data sets and export formats. Verify the structure and content of exported files. Test with different browsers to ensure download functionality works across platforms.",
             "parentId": "undefined"
           }
-        ]
-      },
-      {
-        "id": 20,
-        "title": "Implement API Documentation and Error Handling",
-        "description": "Create comprehensive API documentation, implement robust error handling, and add monitoring for the F1 Picks application.",
-        "details": "1. Implement global error handling:\n   - Frontend error boundary components\n   - Backend exception middleware\n   - Structured error responses\n   - User-friendly error messages\n2. Create API documentation using FastAPI's built-in Swagger/OpenAPI:\n   - Document all endpoints\n   - Add request/response examples\n   - Include authentication requirements\n   - Document error responses\n3. Implement logging and monitoring:\n   - Application logs with structured format\n   - Error tracking integration (Sentry)\n   - Performance monitoring\n   - Usage analytics\n4. Add health check endpoints:\n   - API health status\n   - Database connectivity\n   - Worker status\n5. Implement rate limiting and security headers\n\nExample error handling middleware:\n```python\nfrom fastapi import FastAPI, Request, status\nfrom fastapi.responses import JSONResponse\nfrom fastapi.exceptions import RequestValidationError\nfrom pydantic import ValidationError\nimport logging\nimport sentry_sdk\n\nlogger = logging.getLogger(__name__)\n\napp = FastAPI()\n\nsentry_sdk.init(dsn=\"YOUR_SENTRY_DSN\")\n\n@app.exception_handler(RequestValidationError)\nasync def validation_exception_handler(request: Request, exc: RequestValidationError):\n    logger.warning(f\"Validation error: {exc}\")\n    return JSONResponse(\n        status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,\n        content={\n            \"error\": \"Validation Error\",\n            \"detail\": exc.errors(),\n            \"request_id\": request.state.request_id\n        }\n    )\n\n@app.exception_handler(Exception)\nasync def general_exception_handler(request: Request, exc: Exception):\n    logger.error(f\"Unhandled exception: {exc}\", exc_info=True)\n    sentry_sdk.capture_exception(exc)\n    return JSONResponse(\n        status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,\n        content={\n            \"error\": \"Internal Server Error\",\n            \"message\": \"An unexpected error occurred\",\n            \"request_id\": request.state.request_id\n        }\n    )\n\n@app.middleware(\"http\")\nasync def request_middleware(request: Request, call_next):\n    request_id = str(uuid.uuid4())\n    request.state.request_id = request_id\n    \n    try:\n        response = await call_next(request)\n        return response\n    except Exception as exc:\n        logger.error(f\"Unhandled exception: {exc}\", exc_info=True)\n        sentry_sdk.capture_exception(exc)\n        return JSONResponse(\n            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,\n            content={\n                \"error\": \"Internal Server Error\",\n                \"message\": \"An unexpected error occurred\",\n                \"request_id\": request_id\n            }\n        )\n```",
-        "testStrategy": "1. Test error handling for various error scenarios\n2. Verify API documentation accuracy and completeness\n3. Test logging captures appropriate information\n4. Validate error responses follow consistent format\n5. Test health check endpoints\n6. Verify rate limiting functionality\n7. Test security headers implementation\n8. Validate monitoring integration\n9. Test error tracking with Sentry\n10. Verify documentation is accessible and user-friendly",
-        "priority": "medium",
-        "dependencies": [
-          "11",
-          "12",
-          "13",
-          "14",
-          "15"
         ],
-        "status": "pending",
-        "subtasks": [
-          {
-            "id": 1,
-            "title": "Implement Backend Error Handling Middleware",
-            "description": "Create a robust error handling middleware for the FastAPI backend that captures exceptions, logs errors, and returns structured error responses to clients.",
-            "dependencies": [],
-            "details": "1. Create a middleware function that wraps all API requests\n2. Generate and attach a unique request ID to each request\n3. Implement specific exception handlers for common errors (validation errors, authentication errors, not found errors)\n4. Set up a general exception handler for unexpected errors\n5. Integrate with Sentry for error tracking\n6. Ensure all error responses follow a consistent format with error code, message, and request ID\n7. Add appropriate logging with different severity levels\n8. Include context information in error logs",
-            "status": "pending",
-            "testStrategy": "1. Test with various error scenarios (validation errors, database errors, etc.)\n2. Verify error responses contain the expected structure\n3. Check that request IDs are properly generated and included\n4. Confirm errors are properly logged with correct severity\n5. Validate Sentry integration by triggering test errors",
-            "parentId": "undefined"
-          },
-          {
-            "id": 2,
-            "title": "Implement Frontend Error Boundary Components",
-            "description": "Create React error boundary components to gracefully handle and display frontend errors without crashing the application.",
-            "dependencies": [
-              "20.1"
-            ],
-            "details": "1. Create a global ErrorBoundary component that wraps the main application\n2. Implement component-level error boundaries for critical sections\n3. Design user-friendly error messages and fallback UI components\n4. Add error reporting to send frontend errors to the backend\n5. Implement automatic retry logic for transient errors\n6. Create toast notifications for non-critical errors\n7. Add error details expansion for developers in non-production environments\n8. Implement network error detection and appropriate messaging",
-            "status": "pending",
-            "testStrategy": "1. Test error boundaries by intentionally throwing errors in components\n2. Verify the application doesn't crash when errors occur\n3. Check that error messages are user-friendly\n4. Validate that errors are properly reported to the backend\n5. Test fallback UI components render correctly",
-            "parentId": "undefined"
-          },
-          {
-            "id": 3,
-            "title": "Create API Documentation with Swagger/OpenAPI",
-            "description": "Enhance the FastAPI application with comprehensive API documentation using the built-in Swagger/OpenAPI integration.",
-            "dependencies": [
-              "20.1"
-            ],
-            "details": "1. Add detailed docstrings to all API endpoints\n2. Include request and response examples for each endpoint\n3. Document authentication requirements and how to provide credentials\n4. Add tags to group related endpoints\n5. Document all possible error responses\n6. Include schema definitions for all request/response models\n7. Add operation IDs for each endpoint\n8. Configure the OpenAPI settings to include version, contact info, and terms of service\n9. Add descriptions for all path and query parameters",
-            "status": "pending",
-            "testStrategy": "1. Verify all endpoints are properly documented in the Swagger UI\n2. Test that examples work correctly when tried from the Swagger UI\n3. Check that authentication requirements are clearly documented\n4. Validate that all models have proper descriptions\n5. Ensure error responses are documented for each endpoint",
-            "parentId": "undefined"
-          },
-          {
-            "id": 4,
-            "title": "Implement Logging and Monitoring System",
-            "description": "Set up a comprehensive logging and monitoring system to track application performance, errors, and usage patterns.",
-            "dependencies": [
-              "20.1",
-              "20.2"
-            ],
-            "details": "1. Configure structured JSON logging for the application\n2. Set up different log levels (DEBUG, INFO, WARNING, ERROR)\n3. Implement request/response logging with sensitive data redaction\n4. Create custom logging middleware to capture request duration\n5. Set up Sentry integration for error tracking with environment configuration\n6. Implement performance monitoring for database queries and API calls\n7. Add usage analytics tracking for key user actions\n8. Create a logging utility for consistent log formatting across the application",
-            "status": "pending",
-            "testStrategy": "1. Verify logs are properly formatted and contain necessary context\n2. Test that sensitive information is properly redacted\n3. Check that performance metrics are accurately captured\n4. Validate Sentry captures errors with proper context\n5. Test log rotation and retention policies\n6. Verify different log levels work as expected",
-            "parentId": "undefined"
-          },
-          {
-            "id": 5,
-            "title": "Add Health Checks and Security Headers",
-            "description": "Implement health check endpoints and security headers to improve application reliability and security.",
-            "dependencies": [
-              "20.1",
-              "20.4"
-            ],
-            "details": "1. Create health check endpoints for API status\n2. Implement database connectivity checks\n3. Add worker status monitoring\n4. Implement rate limiting middleware with configurable limits\n5. Add security headers (Content-Security-Policy, X-XSS-Protection, etc.)\n6. Create a circuit breaker for external service calls\n7. Implement graceful degradation for non-critical services\n8. Add a status page that aggregates health information\n9. Implement throttling for authentication attempts",
-            "status": "pending",
-            "testStrategy": "1. Test health check endpoints return correct status\n2. Verify rate limiting blocks excessive requests\n3. Check security headers are present in all responses\n4. Test database connectivity checks with both successful and failed scenarios\n5. Validate circuit breaker functionality by simulating external service failures\n6. Test authentication throttling with repeated login attempts",
-            "parentId": "undefined"
-          }
-        ]
+        "updatedAt": "2025-11-18T22:30:00.000Z"
       }
-    ],
-    "metadata": {
-      "version": "1.0.0",
-      "lastModified": "2025-09-26T03:56:27.540Z",
-      "taskCount": 10,
-      "completedCount": 0,
-      "tags": [
-        "master"
-      ],
-      "created": "2025-09-26T04:03:02.691Z",
-      "description": "Tasks for master context"
-    }
+    ]
   }
 }
