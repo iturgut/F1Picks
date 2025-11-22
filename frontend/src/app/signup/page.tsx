@@ -5,6 +5,9 @@ export const metadata = {
   description: 'Create your F1 Picks account',
 }
 
+// Ensure this page is dynamically rendered
+export const dynamic = 'force-dynamic'
+
 export default function SignupPage() {
   return (
     <div className="flex min-h-screen flex-col justify-center px-6 py-12 lg:px-8 bg-gradient-to-br from-gray-50 to-gray-100">
