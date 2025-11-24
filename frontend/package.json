@@ -3,8 +3,8 @@
   "version": "0.1.4",
   "private": true,
   "scripts": {
-    "dev": "NODE_PATH=../node_modules next dev",
-    "build": "NODE_PATH=../node_modules next build",
+    "dev": "next dev",
+    "build": "next build",
     "start": "next start",
     "lint": "eslint",
     "test": "echo \"No tests yet\" && exit 0"
