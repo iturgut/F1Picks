@@ -10,6 +10,12 @@ const nextConfig: NextConfig = {
   
   // Configure webpack to resolve modules from workspace root
   webpack: (config, { isServer }) => {
+    // Explicitly configure @ alias to ensure it works in all environments
+    config.resolve.alias = {
+      ...config.resolve.alias,
+      '@': path.resolve(__dirname, './src'),
+    };
+    
     // Preserve existing resolve.modules and add workspace root node_modules
     const existingModules = config.resolve.modules || ['node_modules'];
     config.resolve.modules = [
