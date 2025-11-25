@@ -232,7 +232,7 @@
           "11",
           "13"
         ],
-        "status": "pending",
+        "status": "done",
         "subtasks": [
           {
             "id": 1,
@@ -240,7 +240,7 @@
             "description": "Create the main event browsing page that displays upcoming F1 events in chronological order with countdown timers and local time conversion.",
             "dependencies": [],
             "details": "Create a responsive grid layout for event cards. Implement the EventCard component shown in the example, ensuring it displays circuit details, session type, and start time. Add a utility function to convert UTC times to the user's local timezone. Implement a live-updating countdown timer component that shows time remaining until session start. Add sorting functionality to display events in chronological order. Include status indicators (upcoming, live, completed, scored) with appropriate styling. Ensure the page fetches event data from the backend API.",
-            "status": "pending",
+            "status": "done",
             "testStrategy": "Test rendering with mock data for various event states. Verify countdown timer updates correctly. Test timezone conversion accuracy across different user locations. Verify responsive layout on mobile, tablet, and desktop viewports.",
             "parentId": "undefined"
           },
@@ -252,7 +252,7 @@
               "14.1"
             ],
             "details": "Implement form components for each prediction type: DriverSelector for race winner and podium positions (using dropdown or grid of driver cards), TimePredictor for lap and sector time predictions (with appropriate input validation for time format), and PitWindowPredictor for pit stop predictions. Create a FormSection component to group related predictions. Add tooltips explaining prediction rules. Ensure all components support both creation and viewing modes. Style components according to the application's design system. Implement client-side validation for each input type.",
-            "status": "pending",
+            "status": "done",
             "testStrategy": "Test form components with various input scenarios. Verify validation logic prevents invalid submissions. Test keyboard accessibility. Ensure components render correctly in both creation and viewing modes.",
             "parentId": "undefined"
           },
@@ -264,7 +264,7 @@
               "14.2"
             ],
             "details": "Create a PredictionForm container component that combines all prediction components. Implement form state management using React hooks or a form library. Add comprehensive validation to ensure all required fields are completed correctly before submission. Create submission handler that sends prediction data to the backend API. Implement error handling for API failures with user-friendly error messages. Add loading states during submission. Implement success confirmation with appropriate messaging. Create a review screen allowing users to confirm their picks before final submission.",
-            "status": "pending",
+            "status": "done",
             "testStrategy": "Test the complete form submission flow. Verify all validation rules are enforced. Test API integration with mock endpoints. Verify error states display appropriate messages. Test the review and confirmation process.",
             "parentId": "undefined"
           },
@@ -276,7 +276,7 @@
               "14.3"
             ],
             "details": "Implement a time-based locking mechanism that compares current time with session start time. Create a LockStatus component that visually indicates whether predictions are still open or locked. Add disabled states to all form inputs when predictions are locked. Implement server-side validation to prevent late submissions even if client-side checks are bypassed. Create a visual overlay for locked prediction cards showing the user's submitted predictions. Add a countdown component specifically for time remaining to make predictions. Ensure all time comparisons use consistent timezone handling.",
-            "status": "pending",
+            "status": "done",
             "testStrategy": "Test locking mechanism with various time scenarios. Verify UI correctly reflects locked state. Test server-side validation prevents late submissions. Verify the locked overlay displays correctly with submitted prediction data.",
             "parentId": "undefined"
           },
@@ -291,7 +291,7 @@
               "14.4"
             ],
             "details": "Implement responsive layouts for all pages using CSS Grid and Flexbox. Create a navigation system between the event listing, prediction form, and results pages. Add breadcrumb navigation to help users understand their location. Implement filters for the event listing page (upcoming, live, completed, scored). Create mobile-optimized versions of all components with appropriate touch targets. Add swipe gestures for mobile navigation between related screens. Ensure all interactive elements have appropriate hover, focus, and active states. Implement skeleton loading states for improved perceived performance.",
-            "status": "pending",
+            "status": "done",
             "testStrategy": "Test responsive behavior across different device sizes. Verify navigation flows work correctly. Test filter functionality for event listings. Verify touch interactions on mobile devices. Test keyboard navigation for accessibility. Verify loading states display appropriately during data fetching.",
             "parentId": "undefined"
           }

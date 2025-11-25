@@ -14,6 +14,7 @@ import { createClient } from '@/lib/supabase/client'
 interface AuthContextType {
   user: User | null
   loading: boolean
+  getAccessToken: () => Promise<string | null>
   signIn: (email: string, password: string) => Promise<void>
   signUp: (email: string, password: string, metadata?: { name?: string }) => Promise<void>
   signInWithGoogle: () => Promise<void>
@@ -46,6 +47,11 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
     return () => subscription.unsubscribe()
   }, [supabase.auth])
+
+  const getAccessToken = async (): Promise<string | null> => {
+    const { data: { session } } = await supabase.auth.getSession()
+    return session?.access_token ?? null
+  }
 
   const signIn = async (email: string, password: string) => {
     const { error } = await supabase.auth.signInWithPassword({
@@ -107,6 +113,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       value={{
         user,
         loading,
+        getAccessToken,
         signIn,
         signUp,
         signInWithGoogle,
