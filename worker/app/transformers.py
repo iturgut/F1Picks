@@ -45,50 +45,65 @@ class DataTransformer:
                 circuit_name = str(row['Location']) if 'Location' in row else event_name
                 circuit_id = self._normalize_circuit_id(circuit_name)
                 
-                # Create events for each session type
-                session_map = {
-                    'Practice 1': ('practice_1', 'FP1'),
-                    'Practice 2': ('practice_2', 'FP2'),
-                    'Practice 3': ('practice_3', 'FP3'),
-                    'Sprint Qualifying': ('sprint_qualifying', 'SQ'),
-                    'Sprint': ('sprint', 'S'),
-                    'Qualifying': ('qualifying', 'Q'),
-                    'Race': ('race', 'R'),
+                # Map session names to types
+                session_type_map = {
+                    'Practice 1': 'practice_1',
+                    'Practice 2': 'practice_2',
+                    'Practice 3': 'practice_3',
+                    'Sprint Shootout': 'sprint_qualifying',
+                    'Sprint': 'sprint',
+                    'Qualifying': 'qualifying',
+                    'Race': 'race',
                 }
                 
-                for session_name, (session_type_str, session_code) in session_map.items():
-                    # Check if session exists in schedule
-                    session_date_col = f'Session{session_code}Date'
+                # Iterate through Session1-5
+                for session_num in range(1, 6):
+                    session_col = f'Session{session_num}'
+                    session_date_col = f'Session{session_num}DateUtc'
                     
-                    if session_date_col in row and pd.notna(row[session_date_col]):
-                        session_date = pd.to_datetime(row[session_date_col])
+                    if session_col in row and pd.notna(row[session_col]):
+                        session_name = str(row[session_col])
                         
-                        # Estimate session duration
-                        duration = self._estimate_session_duration(session_type_str)
+                        # Get session type
+                        session_type_str = session_type_map.get(session_name)
+                        if not session_type_str:
+                            continue  # Skip unknown session types
                         
-                        # Determine status based on current time
-                        now = datetime.now(pytz.UTC)
-                        if session_date > now:
-                            status = EventStatus.SCHEDULED
-                        elif session_date <= now < session_date + duration:
-                            status = EventStatus.LIVE
-                        else:
-                            status = EventStatus.COMPLETED
-                        
-                        event = Event(
-                            id=uuid4(),
-                            name=f"{event_name} - {session_name}",
-                            circuit_id=circuit_id,
-                            circuit_name=circuit_name,
-                            session_type=EventType[session_type_str.upper()],
-                            round_number=round_number,
-                            year=year,
-                            start_time=session_date.to_pydatetime(),
-                            end_time=(session_date + duration).to_pydatetime(),
-                            status=status,
-                        )
-                        
-                        events.append(event)
+                        # Get session date
+                        if session_date_col in row and pd.notna(row[session_date_col]):
+                            session_date = pd.to_datetime(row[session_date_col])
+                            
+                            # Ensure timezone aware
+                            if session_date.tzinfo is None:
+                                session_date = pytz.UTC.localize(session_date)
+                            
+                            # Estimate session duration
+                            duration = self._estimate_session_duration(session_type_str)
+                            
+                            # Determine status based on current time
+                            now = datetime.now(pytz.UTC)
+                            session_dt = session_date.to_pydatetime()
+                            if session_dt > now:
+                                status = EventStatus.SCHEDULED
+                            elif session_dt <= now < (session_dt + duration):
+                                status = EventStatus.LIVE
+                            else:
+                                status = EventStatus.COMPLETED
+                            
+                            event = Event(
+                                id=uuid4(),
+                                name=f"{event_name} - {session_name}",
+                                circuit_id=circuit_id,
+                                circuit_name=circuit_name,
+                                session_type=EventType[session_type_str.upper()],
+                                round_number=round_number,
+                                year=year,
+                                start_time=session_dt,
+                                end_time=session_dt + duration,
+                                status=status,
+                            )
+                            
+                            events.append(event)
             
             self.logger.info(
                 "Transformed schedule to events",

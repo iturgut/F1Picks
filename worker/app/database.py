@@ -1,30 +1,25 @@
 """
 Database connection and session management for the worker.
-Reuses the backend's database models and configuration.
 """
-import sys
-from pathlib import Path
-
 from sqlalchemy.ext.asyncio import AsyncSession, create_async_engine
 from sqlalchemy.orm import sessionmaker
 
-# Add backend to Python path to import models
-backend_path = Path(__file__).parent.parent.parent / "backend"
-sys.path.insert(0, str(backend_path))
-
-from app.models import Base, Event, Result  # noqa: E402
-from app.models.event import EventStatus, EventType  # noqa: E402
-
 from .config import settings
 from .logger import logger
+from .models import Base, Event, EventStatus, EventType, Result
 
 # Create async engine
+# Note: Supabase uses pgbouncer, so we need to disable prepared statements
 engine = create_async_engine(
     settings.DATABASE_URL,
     echo=False,
     pool_pre_ping=True,
     pool_size=5,
     max_overflow=10,
+    connect_args={
+        "statement_cache_size": 0,  # Required for Supabase/pgbouncer
+        "prepared_statement_cache_size": 0,
+    },
 )
 
 # Create async session factory
