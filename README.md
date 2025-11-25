@@ -1,4 +1,4 @@
-# F1 Picks
+# F1 Picks - Ilayda Turgut
 
 A free-to-play prediction web app for Formula 1 fans who want to compete socially with friends and groups. Users make predictions before race sessions, which are then automatically scored once official timing and telemetry data becomes available via the FastF1 library.
 

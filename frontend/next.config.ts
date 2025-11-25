@@ -10,22 +10,28 @@ const nextConfig: NextConfig = {
   
   // Configure webpack to resolve modules from workspace root
   webpack: (config, { isServer }) => {
-    // Add workspace root node_modules to resolve paths
-    if (!config.resolve.modules) {
-      config.resolve.modules = [];
-    }
-    config.resolve.modules.push(path.resolve(__dirname, "../node_modules"));
-    config.resolve.modules.push("node_modules");
+    // Explicitly configure @ alias to ensure it works in all environments
+    config.resolve.alias = {
+      ...config.resolve.alias,
+      '@': path.resolve(__dirname, './src'),
+    };
     
-    // Ensure loaders can find modules in workspace root
+    // Preserve existing resolve.modules and add workspace root node_modules
+    const existingModules = config.resolve.modules || ['node_modules'];
+    config.resolve.modules = [
+      ...existingModules,
+      path.resolve(__dirname, "../node_modules"),
+    ];
+    
+    // Preserve existing resolveLoader.modules and add workspace root
+    const existingLoaderModules = config.resolveLoader?.modules || ['node_modules'];
     if (!config.resolveLoader) {
       config.resolveLoader = {};
     }
-    if (!config.resolveLoader.modules) {
-      config.resolveLoader.modules = [];
-    }
-    config.resolveLoader.modules.push(path.resolve(__dirname, "../node_modules"));
-    config.resolveLoader.modules.push("node_modules");
+    config.resolveLoader.modules = [
+      ...existingLoaderModules,
+      path.resolve(__dirname, "../node_modules"),
+    ];
     
     return config;
   },
