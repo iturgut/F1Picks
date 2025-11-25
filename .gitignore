@@ -11,8 +11,8 @@ dist/
 downloads/
 eggs/
 .eggs/
-lib/
-lib64/
+/lib/
+/lib64/
 parts/
 sdist/
 var/
@@ -24,13 +24,14 @@ MANIFEST
 
 # Virtual environments
 venv/
-env/
+/env/
 ENV/
 .venv/
 
 # Environment variables
 .env
 .env.local
+.env.test
 .env.development.local
 .env.test.local
 .env.production.local

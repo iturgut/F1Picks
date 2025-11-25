@@ -1,5 +1,27 @@
 # Changelog
 
+## [0.1.6](https://github.com/iturgut/F1Picks/compare/f1-picks-v0.1.5...f1-picks-v0.1.6) (2025-11-25)
+
+
+### Features
+
+* implement FastF1 Integration Worker ([#80](https://github.com/iturgut/F1Picks/issues/80)) ([72ec9d3](https://github.com/iturgut/F1Picks/commit/72ec9d372d0356bf226b0d1dc3b78390759b1de2))
+* implement frontend events browsing ui ([#78](https://github.com/iturgut/F1Picks/issues/78)) ([07f1321](https://github.com/iturgut/F1Picks/commit/07f1321ff9f0197187846d04315b257b2c7dfc9c))
+
+## [0.1.5](https://github.com/iturgut/F1Picks/compare/f1-picks-v0.1.4...f1-picks-v0.1.5) (2025-11-25)
+
+
+### Features
+
+* added auth ([#77](https://github.com/iturgut/F1Picks/issues/77)) ([5b51476](https://github.com/iturgut/F1Picks/commit/5b51476d5cadc1add5effb94fcf96e41079b8822))
+* implement complete database schema and migration system ([#68](https://github.com/iturgut/F1Picks/issues/68)) ([5a0b8fa](https://github.com/iturgut/F1Picks/commit/5a0b8fa1fc0aa4e41e17cb4b96a69f024d489c77))
+
+
+### Bug Fixes
+
+* bump node version ([#72](https://github.com/iturgut/F1Picks/issues/72)) ([7c58475](https://github.com/iturgut/F1Picks/commit/7c58475677632f1fc3e0288eea8a0260da42cd48))
+* implement auth middleware ([#76](https://github.com/iturgut/F1Picks/issues/76)) ([5d3e9e4](https://github.com/iturgut/F1Picks/commit/5d3e9e412c62eb804cbc557127e9cd5d045fe8e5))
+
 ## [0.1.4](https://github.com/iturgut/F1Picks/compare/f1-picks-v0.1.3...f1-picks-v0.1.4) (2025-10-31)
 
 
