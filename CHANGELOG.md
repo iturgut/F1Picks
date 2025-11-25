@@ -1,5 +1,13 @@
 # Changelog
 
+## [0.1.6](https://github.com/iturgut/F1Picks/compare/f1-picks-v0.1.5...f1-picks-v0.1.6) (2025-11-25)
+
+
+### Features
+
+* implement FastF1 Integration Worker ([#80](https://github.com/iturgut/F1Picks/issues/80)) ([72ec9d3](https://github.com/iturgut/F1Picks/commit/72ec9d372d0356bf226b0d1dc3b78390759b1de2))
+* implement frontend events browsing ui ([#78](https://github.com/iturgut/F1Picks/issues/78)) ([07f1321](https://github.com/iturgut/F1Picks/commit/07f1321ff9f0197187846d04315b257b2c7dfc9c))
+
 ## [0.1.5](https://github.com/iturgut/F1Picks/compare/f1-picks-v0.1.4...f1-picks-v0.1.5) (2025-11-25)
 
 
