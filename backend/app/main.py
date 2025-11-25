@@ -16,7 +16,7 @@ app = FastAPI(
 # Configure CORS
 allowed_origins = [
     "http://localhost:3000",  # Local development
-    "https://f1picks.vercel.app",  # Production frontend (update with your actual domain)
+    "https://f1-picks-frontend.vercel.app",  # Production frontend
 ]
 
 # Add any additional origins from environment variable
