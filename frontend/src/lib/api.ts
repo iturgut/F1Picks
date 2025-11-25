@@ -35,7 +35,7 @@ export interface Pick {
   event_id: string
   prop_type: string
   prop_value: string
-  prop_metadata?: Record<string, any>
+  prop_metadata?: Record<string, unknown>
   created_at: string
   updated_at: string
 }
@@ -51,12 +51,12 @@ export interface CreatePickData {
   event_id: string
   prop_type: string
   prop_value: string
-  prop_metadata?: Record<string, any>
+  prop_metadata?: Record<string, unknown>
 }
 
 export interface UpdatePickData {
   prop_value: string
-  prop_metadata?: Record<string, any>
+  prop_metadata?: Record<string, unknown>
 }
 
 /**

@@ -19,7 +19,7 @@ export default function EventsPage() {
         setLoading(true)
         setError(null)
         
-        const params: any = {
+        const params: Record<string, string | number | boolean> = {
           page_size: 50,
         }
         
