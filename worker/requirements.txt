@@ -1,0 +1,32 @@
+# FastF1 Integration Worker Dependencies
+
+# FastF1 library for F1 data
+fastf1>=3.3.0
+
+# Database
+sqlalchemy>=2.0.0
+asyncpg>=0.29.0
+alembic>=1.13.0
+
+# Data processing
+pandas>=2.0.0
+numpy>=1.24.0
+
+# HTTP and async
+aiohttp>=3.9.0
+httpx>=0.25.0
+
+# Configuration and environment
+python-dotenv>=1.0.0
+pydantic>=2.5.0
+pydantic-settings>=2.1.0
+
+# Logging and monitoring
+structlog>=24.1.0
+
+# Scheduling
+apscheduler>=3.10.0
+
+# Utilities
+python-dateutil>=2.8.2
+pytz>=2024.1
