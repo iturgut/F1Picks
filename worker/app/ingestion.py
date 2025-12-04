@@ -189,6 +189,17 @@ class IngestionService:
                 results_count=len(results)
             )
             
+            # Trigger scoring after successful ingestion
+            try:
+                await self._trigger_scoring(event_id)
+            except Exception as e:
+                self.logger.error(
+                    "Failed to trigger scoring",
+                    event_id=str(event_id),
+                    error=str(e)
+                )
+                # Don't fail the ingestion if scoring fails
+            
             return True
             
         except Exception as e:
@@ -278,6 +289,58 @@ class IngestionService:
                 error=str(e)
             )
             return False
+    
+    async def _trigger_scoring(self, event_id: UUID):
+        """
+        Trigger scoring for a completed event.
+        
+        This calls the backend API to score all predictions for the event.
+        
+        Args:
+            event_id: Event UUID
+        """
+        import httpx
+        import os
+        
+        # Get backend API URL from environment
+        api_url = os.getenv("BACKEND_API_URL", "http://localhost:8000")
+        
+        self.logger.info(
+            "Triggering scoring for event",
+            event_id=str(event_id),
+            api_url=api_url
+        )
+        
+        try:
+            async with httpx.AsyncClient() as client:
+                response = await client.post(
+                    f"{api_url}/api/scores/trigger",
+                    json={"event_id": str(event_id)},
+                    timeout=60.0
+                )
+                
+                if response.status_code == 200:
+                    result = response.json()
+                    self.logger.info(
+                        "Scoring completed successfully",
+                        event_id=str(event_id),
+                        picks_scored=result.get("picks_scored", 0),
+                        scores_created=result.get("scores_created", 0)
+                    )
+                else:
+                    self.logger.warning(
+                        "Scoring request failed",
+                        event_id=str(event_id),
+                        status_code=response.status_code,
+                        response=response.text
+                    )
+        except Exception as e:
+            self.logger.error(
+                "Failed to call scoring API",
+                event_id=str(event_id),
+                error=str(e)
+            )
+            raise
 
 
 # Global ingestion service instance

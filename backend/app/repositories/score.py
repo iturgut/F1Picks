@@ -323,3 +323,17 @@ class ScoreRepository(BaseRepository[Score]):
             List of created Score instances
         """
         return await self.bulk_create(scores_data)
+    
+    async def get_by_pick_id(self, pick_id: str) -> Optional[Score]:
+        """
+        Get score by pick ID.
+        
+        Args:
+            pick_id: Pick ID
+            
+        Returns:
+            Score instance or None
+        """
+        query = select(Score).where(Score.pick_id == UUID(pick_id))
+        result = await self.session.execute(query)
+        return result.scalar_one_or_none()
