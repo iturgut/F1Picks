@@ -1,5 +1,25 @@
 # Changelog
 
+## [0.1.8](https://github.com/iturgut/F1Picks/compare/f1-picks-v0.1.7...f1-picks-v0.1.8) (2025-12-05)
+
+
+### Bug Fixes
+
+* Bug fix ([#85](https://github.com/iturgut/F1Picks/issues/85)) ([c251d6f](https://github.com/iturgut/F1Picks/commit/c251d6f140005cbb2dc0603e40d35ad64579ac90))
+
+## [0.1.7](https://github.com/iturgut/F1Picks/compare/f1-picks-v0.1.6...f1-picks-v0.1.7) (2025-12-05)
+
+
+### Features
+
+* implement complete scoring system (Task 15) ([#84](https://github.com/iturgut/F1Picks/issues/84)) ([37abf98](https://github.com/iturgut/F1Picks/commit/37abf9859e51c5c7639af26f460b7a8adf32659f))
+* update middleware to proxy ([#83](https://github.com/iturgut/F1Picks/issues/83)) ([b962563](https://github.com/iturgut/F1Picks/commit/b9625633eb6614e2c24032e6444a02ac25e3a8e7))
+
+
+### Bug Fixes
+
+* update links ([751aecd](https://github.com/iturgut/F1Picks/commit/751aecd40a3c0785c95bcd172bf591710e118c2c))
+
 ## [0.1.6](https://github.com/iturgut/F1Picks/compare/f1-picks-v0.1.5...f1-picks-v0.1.6) (2025-11-25)
 
 
