@@ -21,20 +21,25 @@ if DATABASE_URL.startswith("postgresql://"):
 elif DATABASE_URL.startswith("postgres://"):
     DATABASE_URL = DATABASE_URL.replace("postgres://", "postgresql+asyncpg://", 1)
 
-# Add prepared_statement_cache_size=0 to URL for pgbouncer compatibility
-# This is the most reliable way to disable prepared statements
-if "?" in DATABASE_URL:
-    DATABASE_URL += "&prepared_statement_cache_size=0"
-else:
-    DATABASE_URL += "?prepared_statement_cache_size=0"
-
 # Create async engine with pgbouncer compatibility
+# Supabase uses pgbouncer which requires special configuration for asyncpg
+# We must disable prepared statements completely
 engine = create_async_engine(
     DATABASE_URL,
-    poolclass=NullPool,  # Use NullPool for serverless environments
+    poolclass=NullPool,  # Use NullPool for serverless/pgbouncer environments
     echo=os.getenv("DATABASE_ECHO", "false").lower() == "true",  # Enable SQL logging in dev
     future=True,
-    # pool_pre_ping not compatible with NullPool
+    connect_args={
+        "statement_cache_size": 0,  # CRITICAL: Disable prepared statements for pgbouncer
+        "prepared_statement_cache_size": 0,  # Also disable this cache
+        "server_settings": {
+            "jit": "off",  # Disable JIT compilation for pgbouncer compatibility
+        }
+    },
+    # Also disable SQLAlchemy's query cache
+    query_cache_size=0,
+    # Disable connection pool pre-ping (not compatible with NullPool anyway)
+    pool_pre_ping=False,
 )
 
 # Create session factory with execution options for pgbouncer
