@@ -14,17 +14,33 @@ app = FastAPI(
 )
 
 # Configure CORS
+# Use regex pattern to allow all Vercel deployments
+from starlette.middleware.cors import CORSMiddleware as StarletteMiddleware
+import re
+
 allowed_origins = [
     "http://localhost:3000",  # Local development
     "https://f1-picks-frontend.vercel.app",  # Production frontend
+    "https://f1picks.vercel.app",  # Production frontend (alternate)
 ]
 
 # Add any additional origins from environment variable
 if additional_origins := os.getenv("ADDITIONAL_CORS_ORIGINS"):
     allowed_origins.extend(additional_origins.split(","))
 
+# Allow all Vercel preview deployments
+def is_allowed_origin(origin: str) -> bool:
+    """Check if origin is allowed (including Vercel preview deployments)"""
+    if origin in allowed_origins:
+        return True
+    # Allow any *.vercel.app domain
+    if re.match(r"https://.*\.vercel\.app$", origin):
+        return True
+    return False
+
 app.add_middleware(
     CORSMiddleware,
+    allow_origin_regex=r"https://.*\.vercel\.app",  # Allow all Vercel deployments
     allow_origins=allowed_origins,
     allow_credentials=True,
     allow_methods=["*"],

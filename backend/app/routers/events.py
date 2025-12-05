@@ -123,8 +123,14 @@ async def list_events(
     
     # Convert to response format with is_locked
     now = datetime.now(timezone.utc)
-    event_responses = [
-        EventResponse(
+    event_responses = []
+    for event in events:
+        # Ensure start_time is timezone-aware for comparison
+        start_time = event.start_time
+        if start_time.tzinfo is None:
+            start_time = start_time.replace(tzinfo=timezone.utc)
+        
+        event_responses.append(EventResponse(
             id=event.id,
             name=event.name,
             circuit_id=event.circuit_id,
@@ -137,10 +143,8 @@ async def list_events(
             status=event.status.value,
             created_at=event.created_at,
             updated_at=event.updated_at,
-            is_locked=event.start_time <= now,
-        )
-        for event in events
-    ]
+            is_locked=start_time <= now,
+        ))
     
     return EventListResponse(
         events=event_responses,
@@ -169,6 +173,11 @@ async def get_event(
         raise HTTPException(status_code=404, detail="Event not found")
     
     now = datetime.now(timezone.utc)
+    # Ensure start_time is timezone-aware for comparison
+    start_time = event.start_time
+    if start_time.tzinfo is None:
+        start_time = start_time.replace(tzinfo=timezone.utc)
+    
     return EventResponse(
         id=event.id,
         name=event.name,
@@ -182,5 +191,5 @@ async def get_event(
         status=event.status.value,
         created_at=event.created_at,
         updated_at=event.updated_at,
-        is_locked=event.start_time <= now,
+        is_locked=start_time <= now,
     )
