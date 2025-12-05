@@ -13,33 +13,31 @@ load_dotenv()
 DATABASE_URL = os.getenv("DATABASE_URL")
 if not DATABASE_URL:
     # Default to local Supabase instance
-    DATABASE_URL = "postgresql+asyncpg://postgres:postgres@127.0.0.1:54322/postgres"
+    DATABASE_URL = "postgresql+psycopg://postgres:postgres@127.0.0.1:54322/postgres"
 
-# Ensure we're using asyncpg driver
+# Use psycopg (async) driver instead of asyncpg for better pgbouncer compatibility
 if DATABASE_URL.startswith("postgresql://"):
-    DATABASE_URL = DATABASE_URL.replace("postgresql://", "postgresql+asyncpg://", 1)
+    DATABASE_URL = DATABASE_URL.replace("postgresql://", "postgresql+psycopg://", 1)
 elif DATABASE_URL.startswith("postgres://"):
-    DATABASE_URL = DATABASE_URL.replace("postgres://", "postgresql+asyncpg://", 1)
+    DATABASE_URL = DATABASE_URL.replace("postgres://", "postgresql+psycopg://", 1)
+elif DATABASE_URL.startswith("postgresql+asyncpg://"):
+    DATABASE_URL = DATABASE_URL.replace("postgresql+asyncpg://", "postgresql+psycopg://", 1)
 
 # Create async engine with pgbouncer compatibility
-# Supabase uses pgbouncer which requires special configuration for asyncpg
-# We must disable prepared statements completely
+# psycopg handles pgbouncer better than asyncpg
+connect_args = {}
+if "pooler.supabase.com" in DATABASE_URL:
+    # Disable prepared statements for pgbouncer compatibility
+    connect_args = {
+        "prepare_threshold": None,  # Disable prepared statements
+    }
+
 engine = create_async_engine(
     DATABASE_URL,
-    poolclass=NullPool,  # Use NullPool for serverless/pgbouncer environments
+    poolclass=NullPool,  # Use NullPool for serverless environments
     echo=os.getenv("DATABASE_ECHO", "false").lower() == "true",  # Enable SQL logging in dev
     future=True,
-    connect_args={
-        "statement_cache_size": 0,  # CRITICAL: Disable prepared statements for pgbouncer
-        "prepared_statement_cache_size": 0,  # Also disable this cache
-        "server_settings": {
-            "jit": "off",  # Disable JIT compilation for pgbouncer compatibility
-        }
-    },
-    # Also disable SQLAlchemy's query cache
-    query_cache_size=0,
-    # Disable connection pool pre-ping (not compatible with NullPool anyway)
-    pool_pre_ping=False,
+    connect_args=connect_args,
 )
 
 # Create session factory with execution options for pgbouncer
