@@ -22,13 +22,14 @@ elif DATABASE_URL.startswith("postgres://"):
     DATABASE_URL = DATABASE_URL.replace("postgres://", "postgresql+asyncpg://", 1)
 
 # Create async engine with pgbouncer compatibility
-connect_args = {}
-if "pooler.supabase.com" in DATABASE_URL:
-    # Disable prepared statements for pgbouncer compatibility
-    connect_args = {
-        "statement_cache_size": 0,
-        "prepared_statement_cache_size": 0,
+# Always disable prepared statements to avoid pgbouncer issues
+connect_args = {
+    "statement_cache_size": 0,
+    "prepared_statement_cache_size": 0,
+    "server_settings": {
+        "jit": "off",  # Disable JIT for pgbouncer
     }
+}
 
 engine = create_async_engine(
     DATABASE_URL,
@@ -36,11 +37,12 @@ engine = create_async_engine(
     echo=os.getenv("DATABASE_ECHO", "false").lower() == "true",  # Enable SQL logging in dev
     future=True,
     connect_args=connect_args,
+    pool_pre_ping=True,  # Verify connections before using them
 )
 
-# Create session factory
+# Create session factory with execution options for pgbouncer
 AsyncSessionLocal = async_sessionmaker(
-    engine,
+    engine.execution_options(compiled_cache=None),
     class_=AsyncSession,
     expire_on_commit=False,
 )
