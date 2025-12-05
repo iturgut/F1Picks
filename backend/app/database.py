@@ -21,23 +21,20 @@ if DATABASE_URL.startswith("postgresql://"):
 elif DATABASE_URL.startswith("postgres://"):
     DATABASE_URL = DATABASE_URL.replace("postgres://", "postgresql+asyncpg://", 1)
 
-# Create async engine with pgbouncer compatibility
-# Always disable prepared statements to avoid pgbouncer issues
-connect_args = {
-    "statement_cache_size": 0,
-    "prepared_statement_cache_size": 0,
-    "server_settings": {
-        "jit": "off",  # Disable JIT for pgbouncer
-    }
-}
+# Add prepared_statement_cache_size=0 to URL for pgbouncer compatibility
+# This is the most reliable way to disable prepared statements
+if "?" in DATABASE_URL:
+    DATABASE_URL += "&prepared_statement_cache_size=0"
+else:
+    DATABASE_URL += "?prepared_statement_cache_size=0"
 
+# Create async engine with pgbouncer compatibility
 engine = create_async_engine(
     DATABASE_URL,
     poolclass=NullPool,  # Use NullPool for serverless environments
     echo=os.getenv("DATABASE_ECHO", "false").lower() == "true",  # Enable SQL logging in dev
     future=True,
-    connect_args=connect_args,
-    pool_pre_ping=True,  # Verify connections before using them
+    # pool_pre_ping not compatible with NullPool
 )
 
 # Create session factory with execution options for pgbouncer
