@@ -222,3 +222,35 @@ export async function deletePick(token: string, pickId: string): Promise<void> {
     throw new Error(error.detail || 'Failed to delete pick')
   }
 }
+
+/**
+ * User profile types
+ */
+export interface UserProfile {
+  id: string
+  email: string
+  name: string
+  photo_url?: string
+  created_at: string
+}
+
+/**
+ * Sync user profile with backend
+ * This ensures the user exists in the backend database
+ */
+export async function syncUserProfile(token: string): Promise<UserProfile> {
+  const response = await fetch(`${API_BASE_URL}/api/users/me`, {
+    method: 'GET',
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${token}`,
+    },
+  })
+  
+  if (!response.ok) {
+    const error = await response.json().catch(() => ({ detail: response.statusText }))
+    throw new Error(error.detail || 'Failed to sync user profile')
+  }
+  
+  return response.json()
+}

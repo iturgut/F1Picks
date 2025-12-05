@@ -4,6 +4,7 @@ Picks API router for user predictions.
 from datetime import datetime, timezone
 from typing import List, Optional
 from uuid import UUID
+import logging
 
 from fastapi import APIRouter, Depends, HTTPException, Query
 from pydantic import BaseModel, Field
@@ -16,6 +17,7 @@ from ..models import Event, Pick, User
 from ..models.pick import PropType
 
 router = APIRouter(prefix="/picks", tags=["picks"])
+logger = logging.getLogger(__name__)
 
 
 # Pydantic schemas
@@ -67,6 +69,9 @@ async def create_pick(
     
     Picks can only be created before the event starts.
     """
+    logger.info(f"🔍 Creating pick for user {current_user.id} ({current_user.email})")
+    logger.info(f"🔍 Pick data: event_id={pick_data.event_id}, prop_type={pick_data.prop_type}, prop_value={pick_data.prop_value}")
+    
     # Verify event exists and is not locked
     event_query = select(Event).where(Event.id == pick_data.event_id)
     event_result = await db.execute(event_query)
@@ -145,6 +150,9 @@ async def list_picks(
     - **event_id**: Filter picks for a specific event
     - **prop_type**: Filter by prediction type
     """
+    logger.info(f"🔍 Fetching picks for user {current_user.id} ({current_user.email})")
+    logger.info(f"🔍 Filters: event_id={event_id}, prop_type={prop_type}")
+    
     # Build query for current user's picks
     query = select(Pick).where(Pick.user_id == current_user.id)
     
