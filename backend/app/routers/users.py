@@ -188,3 +188,75 @@ async def get_user_by_id(
         )
     
     return user
+
+
+@router.get("/{user_id}/statistics")
+async def get_user_statistics(
+    user_id: UUID,
+    season: Optional[int] = None,
+    db: AsyncSession = Depends(get_db),
+):
+    """
+    Get comprehensive statistics for a user.
+    
+    Args:
+        user_id: User UUID
+        season: Optional season filter (defaults to current season)
+        db: Database session
+        
+    Returns:
+        User statistics including total points, rank, hit rate, etc.
+    """
+    from app.repositories.score import ScoreRepository
+    from app.repositories.pick import PickRepository
+    from datetime import datetime
+    
+    # Default to current year if no season specified
+    if season is None:
+        season = datetime.now().year
+    
+    score_repo = ScoreRepository(db)
+    pick_repo = PickRepository(db)
+    
+    # Get user's scores for the season
+    scores = await score_repo.get_user_scores(user_id, season=season)
+    
+    # Get user's picks for the season
+    picks = await pick_repo.get_user_picks(user_id, season=season)
+    
+    # Calculate statistics
+    total_points = sum(score.points for score in scores)
+    total_picks = len(picks)
+    scored_picks = len(scores)
+    exact_matches = sum(1 for score in scores if score.exact_match)
+    
+    # Calculate hit rate (exact matches / total scored picks)
+    hit_rate = (exact_matches / scored_picks * 100) if scored_picks > 0 else 0
+    
+    # Calculate average points per pick
+    avg_points = (total_points / scored_picks) if scored_picks > 0 else 0
+    
+    # Calculate average margin
+    margins = [score.margin for score in scores if score.margin is not None]
+    avg_margin = (sum(margins) / len(margins)) if margins else 0
+    
+    # Get season leaderboard to find rank
+    leaderboard = await score_repo.get_season_leaderboard(season=season, limit=1000)
+    user_rank = next(
+        (i + 1 for i, entry in enumerate(leaderboard) if entry["user_id"] == user_id),
+        None
+    )
+    
+    return {
+        "user_id": str(user_id),
+        "season": season,
+        "total_points": total_points,
+        "total_picks": total_picks,
+        "scored_picks": scored_picks,
+        "exact_matches": exact_matches,
+        "hit_rate": round(hit_rate, 2),
+        "average_points": round(avg_points, 2),
+        "average_margin": round(avg_margin, 2),
+        "rank": user_rank,
+        "total_users": len(leaderboard)
+    }

@@ -1,14 +1,16 @@
 /**
- * Next.js Middleware for Authentication
+ * Next.js Proxy for Authentication
  * 
  * Handles authentication state on the server-side for all requests.
  * Refreshes user sessions and manages auth cookies.
+ * 
+ * Note: In Next.js 16+, this is called "proxy" instead of "middleware"
  */
 
 import { createServerClient } from '@supabase/ssr'
 import { NextResponse, type NextRequest } from 'next/server'
 
-export async function middleware(request: NextRequest) {
+export async function proxy(request: NextRequest) {
   let response = NextResponse.next({
     request: {
       headers: request.headers,

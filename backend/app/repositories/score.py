@@ -154,18 +154,22 @@ class ScoreRepository(BaseRepository[Score]):
         from app.models.league import LeagueMember
         from app.models.user import User
 
+        from app.models.pick import Pick
+        from app.models.event import Event
+        
         query = (
             select(
                 Score.user_id,
-                User.username,
-                func.sum(Score.total_points).label('total_points'),
-                func.count(Score.id).label('events_scored'),
-                func.avg(Score.total_points).label('avg_points')
+                User.name.label('username'),
+                func.sum(Score.points).label('total_points'),
+                func.count(func.distinct(Pick.event_id)).label('events_scored'),
+                func.avg(Score.points).label('avg_points')
             )
             .join(User, Score.user_id == User.id)
-            .join(Score.event)
-            .where(Score.event.has(season=season))
-            .group_by(Score.user_id, User.username)
+            .join(Pick, Score.pick_id == Pick.id)
+            .join(Event, Pick.event_id == Event.id)
+            .where(Event.year == season)
+            .group_by(Score.user_id, User.name)
         )
 
         # Add league filter if specified

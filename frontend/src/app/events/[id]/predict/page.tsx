@@ -17,16 +17,36 @@ const PROP_TYPES = [
 ]
 
 const DRIVERS = [
+  // Red Bull Racing
   'Max Verstappen',
-  'Sergio Perez',
+  'Liam Lawson',
+  // Ferrari
   'Charles Leclerc',
-  'Carlos Sainz',
   'Lewis Hamilton',
-  'George Russell',
+  // McLaren
   'Lando Norris',
   'Oscar Piastri',
+  // Mercedes
+  'George Russell',
+  'Andrea Kimi Antonelli',
+  // Aston Martin
   'Fernando Alonso',
   'Lance Stroll',
+  // Alpine
+  'Pierre Gasly',
+  'Jack Doohan',
+  // Williams
+  'Alex Albon',
+  'Carlos Sainz',
+  // Visa Cash App RB
+  'Yuki Tsunoda',
+  'Isack Hadjar',
+  // Kick Sauber
+  'Nico Hulkenberg',
+  'Gabriel Bortoleto',
+  // Haas
+  'Oliver Bearman',
+  'Esteban Ocon',
 ]
 
 export default function PredictPage() {
