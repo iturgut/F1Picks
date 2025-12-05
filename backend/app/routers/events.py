@@ -1,7 +1,7 @@
 """
 Events API router for F1 event management.
 """
-from datetime import datetime
+from datetime import datetime, timezone
 from typing import List, Optional
 from uuid import UUID
 
@@ -94,7 +94,7 @@ async def list_events(
         query = query.where(Event.year == year)
     
     if upcoming_only:
-        query = query.where(Event.start_time > datetime.utcnow())
+        query = query.where(Event.start_time > datetime.now(timezone.utc))
     
     # Order by start time
     query = query.order_by(Event.start_time.asc())
@@ -108,7 +108,7 @@ async def list_events(
     if year:
         count_query = count_query.where(Event.year == year)
     if upcoming_only:
-        count_query = count_query.where(Event.start_time > datetime.utcnow())
+        count_query = count_query.where(Event.start_time > datetime.now(timezone.utc))
     
     result = await db.execute(count_query)
     total = len(result.all())
@@ -122,7 +122,7 @@ async def list_events(
     events = result.scalars().all()
     
     # Convert to response format with is_locked
-    now = datetime.utcnow()
+    now = datetime.now(timezone.utc)
     event_responses = [
         EventResponse(
             id=event.id,

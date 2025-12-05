@@ -8,7 +8,14 @@ const nextConfig: NextConfig = {
   // Enable transpiling packages from workspace
   transpilePackages: ['shared'],
   
-  // Configure webpack to resolve modules from workspace root
+  // Enable Turbopack (Next.js 16+)
+  turbopack: {
+    resolveAlias: {
+      '@': path.resolve(__dirname, './src'),
+    },
+  },
+  
+  // Webpack config for fallback (if --webpack flag is used)
   webpack: (config, { isServer }) => {
     // Explicitly configure @ alias to ensure it works in all environments
     config.resolve.alias = {
