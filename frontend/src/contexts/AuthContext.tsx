@@ -32,16 +32,38 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   useEffect(() => {
     // Get initial session
-    supabase.auth.getSession().then(({ data: { session } }) => {
+    supabase.auth.getSession().then(async ({ data: { session } }) => {
       setUser(session?.user ?? null)
+      
+      // Sync user profile with backend if authenticated
+      if (session?.access_token) {
+        try {
+          const { syncUserProfile } = await import('@/lib/api')
+          await syncUserProfile(session.access_token)
+        } catch (error) {
+          console.error('Failed to sync user profile:', error)
+        }
+      }
+      
       setLoading(false)
     })
 
     // Listen for auth changes
     const {
       data: { subscription },
-    } = supabase.auth.onAuthStateChange((_event, session) => {
+    } = supabase.auth.onAuthStateChange(async (_event, session) => {
       setUser(session?.user ?? null)
+      
+      // Sync user profile with backend if authenticated
+      if (session?.access_token) {
+        try {
+          const { syncUserProfile } = await import('@/lib/api')
+          await syncUserProfile(session.access_token)
+        } catch (error) {
+          console.error('Failed to sync user profile:', error)
+        }
+      }
+      
       setLoading(false)
     })
 

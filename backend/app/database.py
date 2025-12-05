@@ -13,21 +13,23 @@ load_dotenv()
 DATABASE_URL = os.getenv("DATABASE_URL")
 if not DATABASE_URL:
     # Default to local Supabase instance
-    DATABASE_URL = "postgresql+asyncpg://postgres:postgres@127.0.0.1:54322/postgres"
+    DATABASE_URL = "postgresql+psycopg://postgres:postgres@127.0.0.1:54322/postgres"
 
-# Ensure we're using asyncpg driver
+# Use psycopg (async) driver instead of asyncpg for better pgbouncer compatibility
 if DATABASE_URL.startswith("postgresql://"):
-    DATABASE_URL = DATABASE_URL.replace("postgresql://", "postgresql+asyncpg://", 1)
+    DATABASE_URL = DATABASE_URL.replace("postgresql://", "postgresql+psycopg://", 1)
 elif DATABASE_URL.startswith("postgres://"):
-    DATABASE_URL = DATABASE_URL.replace("postgres://", "postgresql+asyncpg://", 1)
+    DATABASE_URL = DATABASE_URL.replace("postgres://", "postgresql+psycopg://", 1)
+elif DATABASE_URL.startswith("postgresql+asyncpg://"):
+    DATABASE_URL = DATABASE_URL.replace("postgresql+asyncpg://", "postgresql+psycopg://", 1)
 
 # Create async engine with pgbouncer compatibility
-# Always disable prepared statements to avoid pgbouncer issues
-connect_args = {
-    "statement_cache_size": 0,
-    "prepared_statement_cache_size": 0,
-    "server_settings": {
-        "jit": "off",  # Disable JIT for pgbouncer
+# psycopg handles pgbouncer better than asyncpg
+connect_args = {}
+if "pooler.supabase.com" in DATABASE_URL:
+    # Disable prepared statements for pgbouncer compatibility
+    connect_args = {
+        "prepare_threshold": None,  # Disable prepared statements
     }
 }
 

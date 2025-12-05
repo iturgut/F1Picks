@@ -76,6 +76,8 @@ async def get_current_user(
     
     Extracts the JWT token from the Authorization header, verifies it,
     and retrieves the corresponding user from the database.
+    If the user doesn't exist in the database, creates a new user record
+    automatically using information from the JWT token.
     
     Args:
         credentials: HTTP Bearer credentials from request header
@@ -104,10 +106,39 @@ async def get_current_user(
     
     # Get user from database
     user_repo = UserRepository(db)
+    import logging
+    logger = logging.getLogger(__name__)
+    
+    logger.info(f"🔍 Looking up user with ID: {user_id}")
     user = await user_repo.get_by_id(user_id)
     
     if not user:
-        raise AuthenticationError("User not found")
+        # Auto-create user from JWT token data
+        logger.warning(f"⚠️ User {user_id} not found in database, creating new user")
+        logger.info(f"🔍 JWT payload: {payload}")
+        
+        email = payload.get("email")
+        user_metadata = payload.get("user_metadata", {})
+        name = user_metadata.get("name") or email.split("@")[0] if email else "User"
+        
+        if not email:
+            logger.error(f"❌ Token missing email for user {user_id}")
+            raise AuthenticationError("Token missing email")
+        
+        logger.info(f"✅ Creating user: id={user_id}, email={email}, name={name}")
+        
+        # Create user record
+        user = await user_repo.create(
+            id=user_id,
+            email=email,
+            name=name,
+            photo_url=user_metadata.get("avatar_url") or user_metadata.get("picture"),
+        )
+        await db.commit()
+        await db.refresh(user)
+        logger.info(f"✅ User {user_id} created successfully")
+    else:
+        logger.info(f"✅ User {user_id} found in database")
     
     return user
 
@@ -123,7 +154,7 @@ async def get_current_user_optional(
     
     Similar to get_current_user, but returns None instead of raising an error
     if no valid authentication is provided. Useful for endpoints that work
-    with or without authentication.
+    with or without authentication. Auto-creates user if not found.
     
     Args:
         credentials: Optional HTTP Bearer credentials from request header
@@ -152,6 +183,26 @@ async def get_current_user_optional(
         
         user_repo = UserRepository(db)
         user = await user_repo.get_by_id(user_id)
+        
+        if not user:
+            # Auto-create user from JWT token data
+            email = payload.get("email")
+            user_metadata = payload.get("user_metadata", {})
+            name = user_metadata.get("name") or email.split("@")[0] if email else "User"
+            
+            if not email:
+                return None
+            
+            # Create user record
+            user = await user_repo.create(
+                id=user_id,
+                email=email,
+                name=name,
+                photo_url=user_metadata.get("avatar_url") or user_metadata.get("picture"),
+            )
+            await db.commit()
+            await db.refresh(user)
+        
         return user
     except (AuthenticationError, Exception):
         # If authentication fails, return None instead of raising error
