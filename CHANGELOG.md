@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.1.9](https://github.com/iturgut/F1Picks/compare/f1-picks-v0.1.8...f1-picks-v0.1.9) (2025-12-05)
+
+
+### Bug Fixes
+
+* re-established db connection ([#87](https://github.com/iturgut/F1Picks/issues/87)) ([97450b1](https://github.com/iturgut/F1Picks/commit/97450b1e53c21d2224a4624dd8ecffc82bd871f7))
+
 ## [0.1.8](https://github.com/iturgut/F1Picks/compare/f1-picks-v0.1.7...f1-picks-v0.1.8) (2025-12-05)
 
 
