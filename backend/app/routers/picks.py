@@ -1,7 +1,7 @@
 """
 Picks API router for user predictions.
 """
-from datetime import datetime
+from datetime import datetime, timezone
 from typing import List, Optional
 from uuid import UUID
 
@@ -76,7 +76,7 @@ async def create_pick(
         raise HTTPException(status_code=404, detail="Event not found")
     
     # Check if event has started (predictions locked)
-    if event.start_time <= datetime.utcnow():
+    if event.start_time <= datetime.now(timezone.utc):
         raise HTTPException(
             status_code=400,
             detail="Cannot create picks for events that have already started"
@@ -272,7 +272,7 @@ async def update_pick(
         raise HTTPException(status_code=404, detail="Associated event not found")
     
     # Check if event has started (predictions locked)
-    if event.start_time <= datetime.utcnow():
+    if event.start_time <= datetime.now(timezone.utc):
         raise HTTPException(
             status_code=400,
             detail="Cannot update picks for events that have already started"
@@ -331,7 +331,7 @@ async def delete_pick(
         raise HTTPException(status_code=404, detail="Associated event not found")
     
     # Check if event has started (predictions locked)
-    if event.start_time <= datetime.utcnow():
+    if event.start_time <= datetime.now(timezone.utc):
         raise HTTPException(
             status_code=400,
             detail="Cannot delete picks for events that have already started"

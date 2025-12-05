@@ -168,7 +168,7 @@ async def get_event(
     if not event:
         raise HTTPException(status_code=404, detail="Event not found")
     
-    now = datetime.utcnow()
+    now = datetime.now(timezone.utc)
     return EventResponse(
         id=event.id,
         name=event.name,
