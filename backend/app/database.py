@@ -31,6 +31,7 @@ if "pooler.supabase.com" in DATABASE_URL:
     connect_args = {
         "prepare_threshold": None,  # Disable prepared statements
     }
+}
 
 engine = create_async_engine(
     DATABASE_URL,
@@ -38,6 +39,7 @@ engine = create_async_engine(
     echo=os.getenv("DATABASE_ECHO", "false").lower() == "true",  # Enable SQL logging in dev
     future=True,
     connect_args=connect_args,
+    pool_pre_ping=True,  # Verify connections before using them
 )
 
 # Create session factory with execution options for pgbouncer
