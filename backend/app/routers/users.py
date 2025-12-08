@@ -5,6 +5,7 @@ Handles user profile creation, retrieval, and updates.
 Integrates with Supabase authentication.
 """
 
+from datetime import datetime
 from typing import Optional
 from uuid import UUID
 
@@ -42,7 +43,7 @@ class UserResponse(BaseModel):
     email: str
     name: str
     photo_url: Optional[str] = None
-    created_at: str
+    created_at: datetime
 
     class Config:
         from_attributes = True

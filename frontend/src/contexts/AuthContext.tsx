@@ -35,8 +35,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     supabase.auth.getSession().then(async ({ data: { session } }) => {
       setUser(session?.user ?? null)
       
-      // Sync user profile with backend if authenticated
-      if (session?.access_token) {
+      // Sync user profile with backend if authenticated (client-side only)
+      if (session?.access_token && typeof window !== 'undefined') {
         try {
           const { syncUserProfile } = await import('@/lib/api')
           await syncUserProfile(session.access_token)
@@ -54,8 +54,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     } = supabase.auth.onAuthStateChange(async (_event, session) => {
       setUser(session?.user ?? null)
       
-      // Sync user profile with backend if authenticated
-      if (session?.access_token) {
+      // Sync user profile with backend if authenticated (client-side only)
+      if (session?.access_token && typeof window !== 'undefined') {
         try {
           const { syncUserProfile } = await import('@/lib/api')
           await syncUserProfile(session.access_token)

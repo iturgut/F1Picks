@@ -50,7 +50,7 @@ export default function ProfilePage() {
 
       // Fetch user profile
       const profileResponse = await fetch(
-        `${process.env.NEXT_PUBLIC_BACKEND_URL}/users/${userId}`
+        `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/users/${userId}`
       );
 
       if (!profileResponse.ok) {
@@ -62,7 +62,7 @@ export default function ProfilePage() {
 
       // Fetch user statistics
       const statsResponse = await fetch(
-        `${process.env.NEXT_PUBLIC_BACKEND_URL}/users/${userId}/statistics?season=${season}`
+        `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/users/${userId}/statistics?season=${season}`
       );
 
       if (statsResponse.ok) {

@@ -88,7 +88,7 @@ class ScoreRepository(BaseRepository[Score]):
             if season:
                 query = query.join(Score.event).where(Score.event.has(season=season))
 
-        query = query.order_by(desc(Score.calculated_at))
+        query = query.order_by(desc(Score.created_at))
 
         result = await self.session.execute(query)
         return list(result.scalars().all())
@@ -219,7 +219,7 @@ class ScoreRepository(BaseRepository[Score]):
             # Update existing score
             existing_score.points_breakdown = points_breakdown
             existing_score.total_points = total_points
-            existing_score.calculated_at = func.now()
+            # updated_at will be automatically set by onupdate
 
             await self.session.flush()
             await self.session.refresh(existing_score)
@@ -232,8 +232,8 @@ class ScoreRepository(BaseRepository[Score]):
                 user_id=user_id,
                 event_id=event_id,
                 points_breakdown=points_breakdown,
-                total_points=total_points,
-                calculated_at=func.now()
+                total_points=total_points
+                # created_at will be automatically set by server_default
             )
 
             self.session.add(new_score)

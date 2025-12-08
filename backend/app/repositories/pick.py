@@ -60,7 +60,7 @@ class PickRepository(BaseRepository[Pick]):
         if load_users:
             query = query.options(selectinload(Pick.user))
 
-        query = query.order_by(Pick.submitted_at)
+        query = query.order_by(Pick.created_at)
 
         result = await self.session.execute(query)
         return list(result.scalars().all())
@@ -89,7 +89,7 @@ class PickRepository(BaseRepository[Pick]):
             if season:
                 query = query.join(Pick.event).where(Pick.event.has(season=season))
 
-        query = query.order_by(Pick.submitted_at.desc())
+        query = query.order_by(Pick.created_at.desc())
 
         result = await self.session.execute(query)
         return list(result.scalars().all())
@@ -125,7 +125,7 @@ class PickRepository(BaseRepository[Pick]):
         if load_users:
             query = query.options(selectinload(Pick.user))
 
-        query = query.order_by(Pick.submitted_at)
+        query = query.order_by(Pick.created_at)
 
         result = await self.session.execute(query)
         return list(result.scalars().all())
@@ -155,7 +155,7 @@ class PickRepository(BaseRepository[Pick]):
             # Update existing pick
             existing_pick.predictions = predictions
             existing_pick.confidence = confidence
-            existing_pick.submitted_at = datetime.now(timezone.utc)
+            # updated_at will be automatically set by onupdate
 
             await self.session.flush()
             await self.session.refresh(existing_pick)
@@ -168,8 +168,8 @@ class PickRepository(BaseRepository[Pick]):
                 user_id=user_id,
                 event_id=event_id,
                 predictions=predictions,
-                confidence=confidence,
-                submitted_at=datetime.now(timezone.utc)
+                confidence=confidence
+                # created_at will be automatically set by server_default
             )
 
             self.session.add(new_pick)

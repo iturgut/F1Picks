@@ -262,20 +262,30 @@ export interface UserProfile {
  * This ensures the user exists in the backend database
  */
 export async function syncUserProfile(token: string): Promise<UserProfile> {
-  const response = await fetch(`${API_BASE_URL}/users/me`, {
-    method: 'GET',
-    headers: {
-      'Content-Type': 'application/json',
-      'Authorization': `Bearer ${token}`,
-    },
-  })
-  
-  if (!response.ok) {
-    const error = await response.json().catch(() => ({ detail: response.statusText }))
-    throw new Error(error.detail || 'Failed to sync user profile')
+  try {
+    console.log('🔍 Syncing user profile to:', `${API_BASE_URL}/api/users/me`)
+    const response = await fetch(`${API_BASE_URL}/api/users/me`, {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}`,
+      },
+    })
+    
+    console.log('📡 Response status:', response.status)
+    
+    if (!response.ok) {
+      const error = await response.json().catch(() => ({ detail: response.statusText }))
+      throw new Error(error.detail || 'Failed to sync user profile')
+    }
+    
+    const data = await response.json()
+    console.log('✅ User profile synced successfully')
+    return data
+  } catch (error) {
+    console.error('❌ Sync error:', error)
+    throw error
   }
-  
-  return response.json()
 }
 
 /**
