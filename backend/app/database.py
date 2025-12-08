@@ -31,7 +31,6 @@ if "pooler.supabase.com" in DATABASE_URL:
     connect_args = {
         "prepare_threshold": None,  # Disable prepared statements
     }
-}
 
 engine = create_async_engine(
     DATABASE_URL,
