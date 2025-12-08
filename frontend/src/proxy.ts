@@ -42,7 +42,29 @@ export async function proxy(request: NextRequest) {
 
   // Refresh session if expired - required for Server Components
   // https://supabase.com/docs/guides/auth/server-side/nextjs
-  await supabase.auth.getUser()
+  const { data: { user } } = await supabase.auth.getUser()
+
+  // Protected routes - redirect to login if not authenticated
+  const protectedPaths = ['/events', '/my-picks', '/leaderboard', '/leagues', '/profile']
+  const isProtectedPath = protectedPaths.some(path => 
+    request.nextUrl.pathname.startsWith(path)
+  )
+
+  if (isProtectedPath && !user) {
+    const redirectUrl = new URL('/login', request.url)
+    redirectUrl.searchParams.set('redirect', request.nextUrl.pathname)
+    return NextResponse.redirect(redirectUrl)
+  }
+
+  // Redirect authenticated users away from auth pages
+  const authPaths = ['/login', '/signup']
+  const isAuthPath = authPaths.some(path => 
+    request.nextUrl.pathname.startsWith(path)
+  )
+
+  if (isAuthPath && user) {
+    return NextResponse.redirect(new URL('/events', request.url))
+  }
 
   return response
 }

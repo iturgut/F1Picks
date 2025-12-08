@@ -1,0 +1,91 @@
+name: F1 Data Sync
+
+on:
+  # Run automatically twice daily at 6 AM and 6 PM UTC
+  schedule:
+    - cron: '0 6,18 * * *'
+  
+  # Allow manual triggering with options
+  workflow_dispatch:
+    inputs:
+      year:
+        description: 'Season year to ingest'
+        required: false
+        default: '2025'
+        type: string
+      skip_schedule:
+        description: 'Skip schedule ingestion'
+        required: false
+        type: boolean
+        default: false
+      skip_results:
+        description: 'Skip results ingestion'
+        required: false
+        type: boolean
+        default: false
+
+jobs:
+  sync-data:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      
+      - name: Install uv
+        run: |
+          curl -LsSf https://astral.sh/uv/install.sh | sh
+          echo "$HOME/.cargo/bin" >> $GITHUB_PATH
+      
+      - name: Create virtual environment
+        working-directory: ./worker
+        run: |
+          uv venv
+          echo "VIRTUAL_ENV=$PWD/venv" >> $GITHUB_ENV
+          echo "$PWD/venv/bin" >> $GITHUB_PATH
+      
+      - name: Install dependencies
+        working-directory: ./worker
+        run: |
+          uv pip install -r requirements.txt
+      
+      - name: Sync F1 data
+        working-directory: ./worker
+        env:
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+          FASTF1_CACHE_DIR: ./cache/fastf1
+        run: |
+          # Build command with optional flags
+          CMD="python ingest_all.py"
+          
+          # Add year (use input if manual trigger, otherwise current year)
+          if [ -n "${{ github.event.inputs.year }}" ]; then
+            CMD="$CMD --year ${{ github.event.inputs.year }}"
+          else
+            CMD="$CMD --year 2025"
+          fi
+          
+          # Add flags based on manual inputs
+          if [ "${{ github.event.inputs.skip_schedule }}" = "true" ]; then
+            CMD="$CMD --skip-schedule"
+          fi
+          
+          if [ "${{ github.event.inputs.skip_results }}" = "true" ]; then
+            CMD="$CMD --skip-results"
+          fi
+          
+          echo "Running: $CMD"
+          $CMD
+      
+      - name: Upload logs on failure
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: sync-logs-${{ github.run_number }}
+          path: worker/logs/
+          retention-days: 7

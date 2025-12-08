@@ -10,6 +10,7 @@ import pytz
 
 from .database import Event, EventStatus, EventType, Result
 from .logger import logger
+from .models import PropType, Result, ResultSource
 
 
 class DataTransformer:
@@ -68,6 +69,10 @@ class DataTransformer:
                         session_type_str = session_type_map.get(session_name)
                         if not session_type_str:
                             continue  # Skip unknown session types
+                        
+                        # Skip practice sessions - we only care about qualifying and races
+                        if session_type_str in ['practice_1', 'practice_2', 'practice_3']:
+                            continue
                         
                         # Get session date
                         if session_date_col in row and pd.notna(row[session_date_col]):
@@ -142,13 +147,35 @@ class DataTransformer:
         
         try:
             for result_data in results_data:
-                # Determine prop_type based on result type and data
+                position = result_data.get('position')
+                
+                # Determine prop_type based on result type and position
+                # Only create results for positions we have prop types for
+                prop_type_str = None
+                
                 if result_type == "race":
-                    prop_type = "race_winner" if result_data.get('position') == 1 else "race_position"
+                    if position == 1:
+                        prop_type_str = "race_winner"
+                    elif position == 2:
+                        prop_type_str = "podium_p2"
+                    elif position == 3:
+                        prop_type_str = "podium_p3"
+                    # Skip other positions - we don't have prop types for them
                 elif result_type == "qualifying":
-                    prop_type = "pole_position" if result_data.get('position') == 1 else "qualifying_position"
-                else:
-                    prop_type = f"{result_type}_position"
+                    if position == 1:
+                        prop_type_str = "pole_position"
+                    # Skip other qualifying positions for now
+                
+                # Skip if we don't have a prop type for this position
+                if not prop_type_str:
+                    continue
+                
+                # Convert string to PropType enum
+                try:
+                    prop_type = PropType(prop_type_str)
+                except ValueError:
+                    self.logger.warning(f"Unknown prop_type: {prop_type_str}, skipping")
+                    continue
                 
                 # Create result record
                 result = Result(
@@ -156,8 +183,8 @@ class DataTransformer:
                     event_id=event_id,
                     prop_type=prop_type,
                     actual_value=result_data.get('driver_name', ''),
-                    source="fastf1",
-                    metadata={
+                    source=ResultSource.FASTF1,
+                    result_metadata={
                         'position': result_data.get('position'),
                         'driver_number': result_data.get('driver_number'),
                         'driver_code': result_data.get('driver_code'),

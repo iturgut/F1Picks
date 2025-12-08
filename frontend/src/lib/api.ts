@@ -40,6 +40,29 @@ export interface Pick {
   updated_at: string
 }
 
+export interface Result {
+  id: string
+  event_id: string
+  prop_type: string
+  actual_value: string
+  result_metadata?: Record<string, unknown>
+  source: string
+  ingested_at: string
+  updated_at: string
+}
+
+export interface Score {
+  id: string
+  pick_id: string
+  user_id: string
+  points: number
+  margin?: number
+  exact_match: boolean
+  scoring_metadata?: Record<string, unknown>
+  created_at: string
+  updated_at: string
+}
+
 export interface PickListResponse {
   picks: Pick[]
   total: number
@@ -239,7 +262,7 @@ export interface UserProfile {
  * This ensures the user exists in the backend database
  */
 export async function syncUserProfile(token: string): Promise<UserProfile> {
-  const response = await fetch(`${API_BASE_URL}/api/users/me`, {
+  const response = await fetch(`${API_BASE_URL}/users/me`, {
     method: 'GET',
     headers: {
       'Content-Type': 'application/json',
@@ -253,4 +276,49 @@ export async function syncUserProfile(token: string): Promise<UserProfile> {
   }
   
   return response.json()
+}
+
+/**
+ * Fetch results for an event
+ */
+export async function fetchEventResults(eventId: string): Promise<Result[]> {
+  const response = await fetch(`${API_BASE_URL}/results?event_id=${eventId}`, {
+    headers: {
+      'Content-Type': 'application/json',
+    },
+  })
+  
+  if (!response.ok) {
+    throw new Error(`Failed to fetch results: ${response.statusText}`)
+  }
+  
+  const data = await response.json()
+  return data.results || []
+}
+
+/**
+ * Fetch scores for user's picks
+ */
+export async function fetchPickScores(token: string, pickIds?: string[]): Promise<Score[]> {
+  const params = new URLSearchParams()
+  if (pickIds && pickIds.length > 0) {
+    pickIds.forEach(id => params.append('pick_id', id))
+  }
+  
+  const response = await fetch(
+    `${API_BASE_URL}/scores?${params.toString()}`,
+    {
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}`,
+      },
+    }
+  )
+  
+  if (!response.ok) {
+    throw new Error(`Failed to fetch scores: ${response.statusText}`)
+  }
+  
+  const data = await response.json()
+  return data.scores || []
 }

@@ -17,7 +17,7 @@ from app.models.user import User
 from app.repositories.score import ScoreRepository
 from app.scoring.service import ScoringService
 
-router = APIRouter(prefix="/api/scores", tags=["scores"])
+router = APIRouter(prefix="/scores", tags=["scores"])
 
 
 # Pydantic schemas
@@ -58,6 +58,62 @@ class ScoringResultResponse(BaseModel):
     scores_created: int
     scores_updated: int
     total_points: int
+
+
+@router.get("", response_model=List[ScoreResponse])
+async def list_scores(
+    pick_id: Optional[List[UUID]] = Query(None, description="Filter by pick IDs"),
+    user_id: Optional[UUID] = Query(None, description="Filter by user ID"),
+    event_id: Optional[UUID] = Query(None, description="Filter by event ID"),
+    db: AsyncSession = Depends(get_db),
+):
+    """
+    Get scores with optional filtering.
+    
+    Args:
+        pick_id: Optional list of pick IDs to filter by
+        user_id: Optional user ID to filter by
+        event_id: Optional event ID to filter by
+        db: Database session
+        
+    Returns:
+        List of scores
+    """
+    from sqlalchemy import select
+    from app.models.score import Score
+    from app.models.pick import Pick
+    
+    # Build query
+    query = select(Score)
+    
+    # Apply filters
+    if pick_id:
+        query = query.where(Score.pick_id.in_(pick_id))
+    if user_id:
+        query = query.where(Score.user_id == user_id)
+    if event_id:
+        # Join with picks to filter by event
+        query = query.join(Pick, Score.pick_id == Pick.id).where(Pick.event_id == event_id)
+    
+    # Execute query
+    result = await db.execute(query)
+    scores = result.scalars().all()
+    
+    # Convert to response models
+    score_responses = []
+    for score in scores:
+        score_responses.append(ScoreResponse(
+            id=score.id,
+            pick_id=score.pick_id,
+            user_id=score.user_id,
+            points=score.points,
+            margin=score.margin,
+            exact_match=score.exact_match,
+            metadata=score.scoring_metadata,
+            created_at=score.created_at.isoformat(),
+        ))
+    
+    return score_responses
 
 
 @router.post("/trigger", response_model=ScoringResultResponse)

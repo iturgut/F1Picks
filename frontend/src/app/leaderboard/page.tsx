@@ -33,7 +33,7 @@ export default function LeaderboardPage() {
       // For now, we'll use season leaderboard
       // TODO: Add support for all-time and current event leaderboards
       const response = await fetch(
-        `${process.env.NEXT_PUBLIC_API_URL}/api/scores/leaderboard/season/${season}?limit=50`,
+        `${process.env.NEXT_PUBLIC_BACKEND_URL}/scores/leaderboard/season/${season}?limit=50`,
         {
           headers: {
             'Content-Type': 'application/json',

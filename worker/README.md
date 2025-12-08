@@ -9,151 +9,138 @@ This worker service fetches and ingests Formula 1 data using the FastF1 library.
 - **Automatic Status Updates**: Updates event statuses (scheduled → live → completed)
 - **Idempotent Operations**: Safe to retry without duplicating data
 - **Structured Logging**: JSON or console logging for monitoring
-- **Scheduler**: Periodic polling with configurable intervals
+- **GitHub Actions Integration**: Automated twice-daily syncing
 
-## Installation
+## Quick Start
+
+### Local Development
 
 ```bash
 cd worker
-python -m venv venv
+uv venv
 source venv/bin/activate  # On Windows: venv\Scripts\activate
-pip install -r requirements.txt
+uv pip install -r requirements.txt
 ```
 
-## Configuration
+### Configuration
 
 Create a `.env` file in the worker directory:
 
 ```env
-DATABASE_URL=postgresql+asyncpg://postgres:postgres@localhost:5432/f1picks
+DATABASE_URL=postgresql+asyncpg://user:password@host:port/database
 FASTF1_CACHE_DIR=./cache/fastf1
-POLL_INTERVAL_MINUTES=30
 LOG_LEVEL=INFO
-LOG_FORMAT=console
-ENABLE_SCHEDULER=true
 ```
 
-## Usage
-
-### CLI Commands
+### Run Data Ingestion
 
 ```bash
-# Show configuration
-python cli.py config
+# Ingest everything (schedule + results)
+python ingest_all.py
 
-# Ingest season schedule
-python cli.py ingest-schedule --year 2024
+# Only fetch new results (skip schedule)
+python ingest_all.py --skip-schedule
 
-# Ingest results for a specific event
-python cli.py ingest-results <event-id>
+# Only update schedule (skip results)
+python ingest_all.py --skip-results
 
-# Run the worker service
-python cli.py run
+# Ingest specific year
+python ingest_all.py --year 2024
 ```
 
-### Running as a Service
+## Automated Syncing
 
-```bash
-# Start the worker
-python -m app.main
+### GitHub Actions
 
-# Or use the CLI
-python cli.py run
-```
+The workflow automatically runs twice daily at 6 AM and 6 PM UTC.
 
-The worker will:
-1. Connect to the database
-2. Start the scheduler
-3. Poll for completed events every 30 minutes (configurable)
-4. Update event statuses every 5 minutes
-5. Ingest results when available
+**Setup:**
+1. Add `DATABASE_URL` to GitHub Secrets
+2. Push to GitHub
+3. Done! Automatic syncing is enabled
+
+**Manual trigger:**
+1. Go to Actions → "F1 Data Sync"
+2. Click "Run workflow"
+3. Configure options if needed
 
 ## Architecture
 
 ### Components
 
-- **`fastf1_client.py`**: Wrapper around FastF1 library for fetching F1 data
-- **`transformers.py`**: Converts FastF1 data to database schema
-- **`ingestion.py`**: Handles database operations for storing data
-- **`scheduler.py`**: APScheduler-based periodic task execution
-- **`main.py`**: Main worker service entry point
-- **`cli.py`**: Command-line interface for manual operations
+- **`ingest_all.py`**: Master ingestion script (schedule + results)
+- **`app/fastf1_client.py`**: Wrapper around FastF1 library
+- **`app/transformers.py`**: Converts FastF1 data to database schema
+- **`app/ingestion.py`**: Handles database operations
+- **`app/models.py`**: Database models (Event, Result, etc.)
 
 ### Data Flow
 
 ```
 FastF1 API → FastF1Client → Transformer → IngestionService → Database
-                ↓
-            Scheduler (polls periodically)
 ```
+
+### What Gets Ingested
+
+**Events:**
+- ✅ Qualifying sessions
+- ✅ Race sessions
+- ✅ Sprint sessions
+- ❌ Practice sessions (skipped)
+
+**Results:**
+- Race: Winner (P1), P2, P3
+- Qualifying: Pole position (P1)
 
 ## Development
 
-### Running Tests
+### Testing Locally
 
 ```bash
-pytest tests/
+# Run ingestion
+python ingest_all.py
+
+# Check what was ingested
+python -c "from app.database import *; import asyncio; asyncio.run(init_db())"
 ```
 
-### Manual Testing
+## Environment Variables
 
-```bash
-# Test schedule ingestion
-python cli.py ingest-schedule --year 2024
-
-# Check logs
-tail -f logs/worker.log
-```
-
-## Deployment
-
-### Docker
-
-```dockerfile
-FROM python:3.12-slim
-WORKDIR /app
-COPY requirements.txt .
-RUN pip install -r requirements.txt
-COPY . .
-CMD ["python", "-m", "app.main"]
-```
-
-### Environment Variables
-
-- `DATABASE_URL`: PostgreSQL connection string
-- `FASTF1_CACHE_DIR`: Directory for FastF1 cache files
-- `POLL_INTERVAL_MINUTES`: How often to poll for new data (default: 30)
-- `POST_SESSION_DELAY_MINUTES`: Wait time after session ends (default: 30)
-- `LOG_LEVEL`: Logging level (DEBUG, INFO, WARNING, ERROR)
-- `LOG_FORMAT`: Log format (json, console)
-- `ENABLE_SCHEDULER`: Enable/disable automatic polling (default: true)
-
-## Monitoring
-
-The worker logs structured JSON (in production) or console output (in development) with:
-
-- Event ingestion status
-- Polling attempts and results
-- Error conditions
-- Performance metrics
+- `DATABASE_URL`: PostgreSQL connection string (required)
+  ```
+  postgresql+asyncpg://user:password@host:port/database
+  ```
+- `FASTF1_CACHE_DIR`: Directory for FastF1 cache files (default: `./cache/fastf1`)
+- `LOG_LEVEL`: Logging level - DEBUG, INFO, WARNING, ERROR (default: INFO)
 
 ## Troubleshooting
 
-### FastF1 Data Not Available
+### No Results Found
 
-FastF1 data typically becomes available 30-120 minutes after a session ends. The worker will automatically retry.
+**Cause:** FastF1 data typically becomes available 30-120 minutes after a session ends.
 
-### Database Connection Issues
+**Solution:** Wait and run again, or let GitHub Actions handle it automatically.
 
-Check the `DATABASE_URL` environment variable and ensure PostgreSQL is running.
+### Database Connection Errors
 
-### Cache Issues
+**Cause:** Incorrect `DATABASE_URL` or network issues.
 
-Clear the FastF1 cache if data seems stale:
+**Solution:**
+1. Verify `DATABASE_URL` in `.env`
+2. Ensure database is accessible
+3. Use `postgresql+asyncpg://` prefix (not `postgresql://`)
 
-```bash
-rm -rf cache/fastf1/*
-```
+### Enum Type Errors
+
+**Cause:** Worker models don't match backend schema.
+
+**Solution:** Ensure `app/models.py` enums match backend exactly.
+
+## Performance
+
+- **Schedule ingestion:** ~5-10 seconds for full season
+- **Results ingestion:** ~30-60 seconds per event (FastF1 download time)
+- **Total for 20 events:** ~15-20 minutes
 
 ## License
 
