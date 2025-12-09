@@ -6,7 +6,7 @@ from sqlalchemy.orm import sessionmaker
 
 from .config import settings
 from .logger import logger
-from .models import Base, Event, EventStatus, EventType, Result
+from .models import Base, Event, EventStatus, EventType, Result, ResultSource
 
 # Create async engine
 # Note: Supabase uses pgbouncer, so we need to disable prepared statements

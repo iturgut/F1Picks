@@ -40,6 +40,29 @@ export interface Pick {
   updated_at: string
 }
 
+export interface Result {
+  id: string
+  event_id: string
+  prop_type: string
+  actual_value: string
+  result_metadata?: Record<string, unknown>
+  source: string
+  ingested_at: string
+  updated_at: string
+}
+
+export interface Score {
+  id: string
+  pick_id: string
+  user_id: string
+  points: number
+  margin?: number
+  exact_match: boolean
+  scoring_metadata?: Record<string, unknown>
+  created_at: string
+  updated_at: string
+}
+
 export interface PickListResponse {
   picks: Pick[]
   total: number
@@ -239,8 +262,74 @@ export interface UserProfile {
  * This ensures the user exists in the backend database
  */
 export async function syncUserProfile(token: string): Promise<UserProfile> {
-  const response = await fetch(`${API_BASE_URL}/api/users/me`, {
-    method: 'GET',
+  try {
+    console.log('🔍 Syncing user profile to:', `${API_BASE_URL}/api/users/me`)
+    const response = await fetch(`${API_BASE_URL}/api/users/me`, {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}`,
+      },
+    })
+    
+    console.log('📡 Response status:', response.status)
+    
+    if (!response.ok) {
+      const error = await response.json().catch(() => ({ detail: response.statusText }))
+      throw new Error(error.detail || 'Failed to sync user profile')
+    }
+    
+    const data = await response.json()
+    console.log('✅ User profile synced successfully')
+    return data
+  } catch (error) {
+    console.error('❌ Sync error:', error)
+    throw error
+  }
+}
+
+// League types and functions
+export interface League {
+  id: string
+  name: string
+  description?: string
+  is_global: boolean
+  owner_id?: string
+  created_at: string
+  member_count?: number
+}
+
+export interface LeagueCreate {
+  name: string
+  description?: string
+}
+
+/**
+ * Create a new league
+ */
+export async function createLeague(token: string, data: LeagueCreate): Promise<League> {
+  const response = await fetch(`${API_BASE_URL}/api/leagues`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${token}`,
+    },
+    body: JSON.stringify(data),
+  })
+  
+  if (!response.ok) {
+    const error = await response.json().catch(() => ({ detail: response.statusText }))
+    throw new Error(error.detail || 'Failed to create league')
+  }
+  
+  return response.json()
+}
+
+/**
+ * Get all leagues for the current user
+ */
+export async function fetchUserLeagues(token: string): Promise<League[]> {
+  const response = await fetch(`${API_BASE_URL}/api/leagues`, {
     headers: {
       'Content-Type': 'application/json',
       'Authorization': `Bearer ${token}`,
@@ -249,8 +338,126 @@ export async function syncUserProfile(token: string): Promise<UserProfile> {
   
   if (!response.ok) {
     const error = await response.json().catch(() => ({ detail: response.statusText }))
-    throw new Error(error.detail || 'Failed to sync user profile')
+    throw new Error(error.detail || 'Failed to fetch leagues')
   }
   
   return response.json()
+}
+
+/**
+ * Delete a league (owner only)
+ */
+export async function deleteLeague(token: string, leagueId: string): Promise<void> {
+  const response = await fetch(`${API_BASE_URL}/api/leagues/${leagueId}`, {
+    method: 'DELETE',
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${token}`,
+    },
+  })
+  
+  if (!response.ok) {
+    const error = await response.json().catch(() => ({ detail: response.statusText }))
+    throw new Error(error.detail || 'Failed to delete league')
+  }
+}
+
+/**
+ * Kick a member from a league (owner only)
+ */
+export async function kickMember(token: string, leagueId: string, userId: string): Promise<void> {
+  const response = await fetch(`${API_BASE_URL}/api/leagues/${leagueId}/members/${userId}`, {
+    method: 'DELETE',
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${token}`,
+    },
+  })
+  
+  if (!response.ok) {
+    const error = await response.json().catch(() => ({ detail: response.statusText }))
+    throw new Error(error.detail || 'Failed to kick member')
+  }
+}
+
+/**
+ * Search for users by name or email
+ */
+export async function searchUsers(token: string, query: string): Promise<UserProfile[]> {
+  const response = await fetch(`${API_BASE_URL}/api/users/search?q=${encodeURIComponent(query)}`, {
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${token}`,
+    },
+  })
+  
+  if (!response.ok) {
+    const error = await response.json().catch(() => ({ detail: response.statusText }))
+    throw new Error(error.detail || 'Failed to search users')
+  }
+  
+  return response.json()
+}
+
+/**
+ * Invite a user to a league (owner only)
+ */
+export async function inviteUserToLeague(token: string, leagueId: string, userId: string): Promise<void> {
+  const response = await fetch(`${API_BASE_URL}/api/leagues/${leagueId}/invite/${userId}`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${token}`,
+    },
+  })
+  
+  if (!response.ok) {
+    const error = await response.json().catch(() => ({ detail: response.statusText }))
+    throw new Error(error.detail || 'Failed to invite user')
+  }
+}
+
+/**
+ * Fetch results for an event
+ */
+export async function fetchEventResults(eventId: string): Promise<Result[]> {
+  const response = await fetch(`${API_BASE_URL}/results?event_id=${eventId}`, {
+    headers: {
+      'Content-Type': 'application/json',
+    },
+  })
+  
+  if (!response.ok) {
+    throw new Error(`Failed to fetch results: ${response.statusText}`)
+  }
+  
+  const data = await response.json()
+  return data.results || []
+}
+
+/**
+ * Fetch scores for user's picks
+ */
+export async function fetchPickScores(token: string, pickIds?: string[]): Promise<Score[]> {
+  const params = new URLSearchParams()
+  if (pickIds && pickIds.length > 0) {
+    pickIds.forEach(id => params.append('pick_id', id))
+  }
+  
+  const response = await fetch(
+    `${API_BASE_URL}/scores?${params.toString()}`,
+    {
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}`,
+      },
+    }
+  )
+  
+  if (!response.ok) {
+    throw new Error(`Failed to fetch scores: ${response.statusText}`)
+  }
+  
+  const data = await response.json()
+  return data.scores || []
 }

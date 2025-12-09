@@ -37,12 +37,18 @@ export default function Navigation() {
             </Link>
 
             {user && (
-              <div className="hidden md:flex space-x-4">
+              <div className="flex space-x-2">
                 <Link href="/events" className={navLinkClass('/events')}>
                   Events
                 </Link>
+                <Link href="/my-picks" className={navLinkClass('/my-picks')}>
+                  My Picks
+                </Link>
                 <Link href="/leaderboard" className={navLinkClass('/leaderboard')}>
                   Leaderboard
+                </Link>
+                <Link href="/leagues" className={navLinkClass('/leagues')}>
+                  Leagues
                 </Link>
               </div>
             )}
@@ -89,17 +95,6 @@ export default function Navigation() {
           </div>
         </div>
 
-        {/* Mobile menu */}
-        {user && (
-          <div className="md:hidden pb-3 space-x-2">
-            <Link href="/events" className={navLinkClass('/events')}>
-              Events
-            </Link>
-            <Link href="/leaderboard" className={navLinkClass('/leaderboard')}>
-              Leaderboard
-            </Link>
-          </div>
-        )}
       </div>
     </nav>
   );

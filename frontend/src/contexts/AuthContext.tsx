@@ -35,8 +35,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     supabase.auth.getSession().then(async ({ data: { session } }) => {
       setUser(session?.user ?? null)
       
-      // Sync user profile with backend if authenticated
-      if (session?.access_token) {
+      // Sync user profile with backend if authenticated (client-side only)
+      if (session?.access_token && typeof window !== 'undefined') {
         try {
           const { syncUserProfile } = await import('@/lib/api')
           await syncUserProfile(session.access_token)
@@ -54,8 +54,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     } = supabase.auth.onAuthStateChange(async (_event, session) => {
       setUser(session?.user ?? null)
       
-      // Sync user profile with backend if authenticated
-      if (session?.access_token) {
+      // Sync user profile with backend if authenticated (client-side only)
+      if (session?.access_token && typeof window !== 'undefined') {
         try {
           const { syncUserProfile } = await import('@/lib/api')
           await syncUserProfile(session.access_token)
@@ -99,20 +99,22 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   }
 
   const signInWithGoogle = async () => {
+    const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || window.location.origin
     const { error } = await supabase.auth.signInWithOAuth({
       provider: 'google',
       options: {
-        redirectTo: `${window.location.origin}/auth/callback`,
+        redirectTo: `${siteUrl}/auth/callback`,
       },
     })
     if (error) throw error
   }
 
   const signInWithApple = async () => {
+    const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || window.location.origin
     const { error } = await supabase.auth.signInWithOAuth({
       provider: 'apple',
       options: {
-        redirectTo: `${window.location.origin}/auth/callback`,
+        redirectTo: `${siteUrl}/auth/callback`,
       },
     })
     if (error) throw error
@@ -124,8 +126,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   }
 
   const resetPassword = async (email: string) => {
+    const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || window.location.origin
     const { error } = await supabase.auth.resetPasswordForEmail(email, {
-      redirectTo: `${window.location.origin}/auth/reset-password`,
+      redirectTo: `${siteUrl}/auth/reset-password`,
     })
     if (error) throw error
   }

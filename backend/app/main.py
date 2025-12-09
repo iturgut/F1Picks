@@ -5,7 +5,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from .database import get_db
-from .routers import events, picks, scores, users
+from .routers import events, picks, results, scores, users
 
 app = FastAPI(
     title="F1 Picks API",
@@ -51,6 +51,7 @@ app.add_middleware(
 app.include_router(users.router)
 app.include_router(events.router)
 app.include_router(picks.router)
+app.include_router(results.router)
 app.include_router(scores.router)
 
 @app.get("/")

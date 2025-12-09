@@ -106,4 +106,7 @@ Thumbs.db
 # tasks/
 
 # Error logs and debugging files
-errors/ 
+errors/
+
+# FastF1 cache
+worker/cache/

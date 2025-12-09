@@ -31,10 +31,14 @@ class Settings(BaseSettings):
     WORKER_NAME: str = "fastf1-worker"
     ENABLE_SCHEDULER: bool = True
     
+    # Backend API Configuration (optional, for future use)
+    BACKEND_API_URL: str = "http://localhost:8000"
+    
     model_config = SettingsConfigDict(
         env_file=".env",
         env_file_encoding="utf-8",
         case_sensitive=True,
+        extra="ignore",  # Ignore extra fields in .env
     )
 
 

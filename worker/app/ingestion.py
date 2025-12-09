@@ -235,8 +235,13 @@ class IngestionService:
                     return False
                 
                 # Check if session has ended
-                now = datetime.utcnow()
-                if event.end_time > now:
+                from datetime import timezone as tz
+                now = datetime.now(tz.utc)
+                # Ensure end_time is timezone-aware for comparison
+                end_time = event.end_time
+                if end_time.tzinfo is None:
+                    end_time = end_time.replace(tzinfo=tz.utc)
+                if end_time > now:
                     self.logger.info(
                         "Session not yet ended",
                         event_id=str(event_id),
@@ -245,7 +250,7 @@ class IngestionService:
                     return False
                 
                 # Check if enough time has passed (30 min delay)
-                time_since_end = now - event.end_time
+                time_since_end = now - end_time
                 if time_since_end < timedelta(minutes=30):
                     self.logger.info(
                         "Too soon to check for data",
