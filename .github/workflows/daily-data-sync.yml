@@ -42,17 +42,10 @@ jobs:
           curl -LsSf https://astral.sh/uv/install.sh | sh
           echo "$HOME/.cargo/bin" >> $GITHUB_PATH
       
-      - name: Create virtual environment
-        working-directory: ./worker
-        run: |
-          uv venv
-          echo "VIRTUAL_ENV=$PWD/venv" >> $GITHUB_ENV
-          echo "$PWD/venv/bin" >> $GITHUB_PATH
-      
       - name: Install dependencies
         working-directory: ./worker
         run: |
-          uv pip install -r requirements.txt
+          uv pip install --system -r requirements.txt
       
       - name: Sync F1 data
         working-directory: ./worker
