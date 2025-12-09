@@ -1,6 +1,9 @@
-# F1 Picks - Ilayda Turgut
+# F1 Picks
 
 A free-to-play prediction web app for Formula 1 fans who want to compete socially with friends and groups. Users make predictions before race sessions, which are then automatically scored once official timing and telemetry data becomes available via the FastF1 library.
+
+🌐 **Live App**: [https://f1-picks-frontend.vercel.app](https://f1-picks-frontend.vercel.app)  
+🔧 **API**: [https://f1picks-backend.fly.dev](https://f1picks-backend.fly.dev)
 
 ## 🏎️ Features
 
@@ -22,14 +25,14 @@ This is a monorepo containing:
 
 ### Tech Stack
 
-- **Frontend**: Next.js 15, React 19, TypeScript 5, Tailwind CSS
+- **Frontend**: Next.js 15, React 19, TypeScript 5, Tailwind CSS, shadcn/ui
 - **Backend**: FastAPI, SQLAlchemy, Alembic, asyncpg, Python 3.13
-- **Database**: PostgreSQL
+- **Database**: PostgreSQL (Supabase)
 - **Data Source**: FastF1 library for F1 telemetry and results
-- **Authentication**: Supabase (email/password, OAuth)
-- **Deployment**: Vercel (frontend), Fly.io (backend)
+- **Authentication**: Supabase Auth (email/password, OAuth)
+- **Deployment**: Vercel (frontend), Fly.io (backend), automated via GitHub Actions
 - **CI/CD**: GitHub Actions with Release Please
-- **Containerization**: Docker (backend)
+- **Package Management**: npm workspaces (frontend), uv (backend)
 
 ## 🚀 Quick Start
 
@@ -63,13 +66,21 @@ This is a monorepo containing:
 
 3. **Environment Setup**
    ```bash
-   # Copy environment template
+   # Backend environment
+   cd backend
    cp .env.example .env
+   # Edit .env with your configuration:
+   # - DATABASE_URL (PostgreSQL connection string)
+   # - SUPABASE_URL and SUPABASE_ANON_KEY
+   # - SECRET_KEY for JWT tokens
    
-   # Edit .env with your configuration
-   # - Database connection string
-   # - Firebase configuration
-   # - API keys
+   # Frontend environment
+   cd ../frontend
+   cp .env.example .env
+   # Edit .env with:
+   # - NEXT_PUBLIC_SUPABASE_URL
+   # - NEXT_PUBLIC_SUPABASE_ANON_KEY
+   # - NEXT_PUBLIC_API_URL (backend URL)
    ```
 
 4. **Database Setup**
@@ -77,6 +88,9 @@ This is a monorepo containing:
    # Run database migrations
    cd backend
    alembic upgrade head
+   
+   # Optional: Seed development data
+   python scripts/seed_dev_data.py
    ```
 
 5. **Start Development Servers**
@@ -95,23 +109,36 @@ This is a monorepo containing:
 F1Picks/
 ├── frontend/                 # Next.js frontend application
 │   ├── src/
-│   │   ├── app/             # App router pages
-│   │   ├── components/      # React components
-│   │   └── lib/            # Frontend utilities
-│   ├── public/             # Static assets
+│   │   ├── app/             # App router pages (home, leagues, profile)
+│   │   ├── components/      # React components (ui, layout)
+│   │   ├── contexts/        # React contexts (auth)
+│   │   └── lib/             # API client, utilities
+│   ├── public/              # Static assets
 │   └── package.json
 ├── backend/                 # FastAPI backend application
 │   ├── app/
-│   │   ├── api/            # API routes
-│   │   ├── core/           # Core configuration
-│   │   ├── models/         # Database models
-│   │   ├── schemas/        # Pydantic schemas
-│   │   └── main.py         # FastAPI app
-│   ├── alembic/            # Database migrations
-│   ├── tests/              # Backend tests
+│   │   ├── models/          # SQLAlchemy database models
+│   │   ├── repositories/    # Data access layer
+│   │   ├── routers/         # API endpoints (users, leagues, picks, etc.)
+│   │   ├── config.py        # Application settings
+│   │   ├── database.py      # Database connection
+│   │   └── main.py          # FastAPI app with CORS
+│   ├── alembic/             # Database migrations
+│   ├── scripts/             # Utility scripts (seed data, migrations)
+│   ├── tests/               # Backend tests
+│   ├── requirements.txt     # Python dependencies
+│   └── fly.toml             # Fly.io deployment config
+├── worker/                  # FastF1 data ingestion worker
+│   ├── app/
+│   │   ├── fastf1_client.py # FastF1 integration
+│   │   ├── scheduler.py     # Celery task scheduler
+│   │   └── database.py      # Database connection
 │   └── requirements.txt
-├── shared/                  # Shared utilities and types
+├── shared/                  # Shared TypeScript types
 ├── .github/workflows/       # CI/CD workflows
+│   ├── ci.yml              # PR validation
+│   ├── deploy.yml          # Production deployment
+│   └── daily-data-sync.yml # Scheduled data updates
 ├── package.json            # Root package.json with workspaces
 └── README.md
 ```
@@ -153,13 +180,23 @@ The project uses a multi-workflow GitHub Actions setup:
    - Follows Conventional Commits specification
 
 ### Frontend (Vercel)
+- **URL**: https://f1-picks-frontend.vercel.app
 - Automatic deployment from `main` branch via Vercel GitHub integration
-- Environment variables configured in Vercel dashboard
+- Environment variables configured in Vercel dashboard:
+  - `NEXT_PUBLIC_API_URL`
+  - `NEXT_PUBLIC_SUPABASE_URL`
+  - `NEXT_PUBLIC_SUPABASE_ANON_KEY`
 
 ### Backend (Fly.io)
-- Deployed using `fly.toml` configuration and Dockerfile
+- **URL**: https://f1picks-backend.fly.dev
+- Deployed using `fly.toml` configuration
 - Triggered by `deploy.yml` workflow on merge to `main`
-- Database and environment variables configured via Fly.io secrets
+- Database migrations run automatically on deployment
+- Environment variables configured via Fly.io secrets:
+  - `DATABASE_URL`
+  - `SUPABASE_URL`
+  - `SUPABASE_SERVICE_ROLE_KEY`
+  - `SECRET_KEY`
 
 ## 🧪 Testing
 
@@ -205,11 +242,27 @@ All tests run automatically on pull requests via GitHub Actions.
 
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
 
-## 🏁 Roadmap
+## 🏁 Current Status & Roadmap
 
-- [ ] MVP: Global leaderboard with basic telemetry props
-- [ ] Private leagues and invitations
-- [ ] Advanced telemetry props (undercuts, anomaly detection)
+### ✅ Completed
+- [x] Full-stack application deployed (Frontend on Vercel, Backend on Fly.io)
+- [x] Database schema with 8 models (User, League, Event, Pick, Result, Score, etc.)
+- [x] Supabase authentication integration
+- [x] League management (create, join, view members)
+- [x] User profiles and leaderboards
+- [x] CI/CD pipeline with automated deployments
+- [x] CORS configuration for production
+- [x] Database migrations with Alembic
+
+### 🚧 In Progress
+- [ ] FastF1 data ingestion worker
+- [ ] Automated scoring system
+- [ ] Real-time leaderboard updates
+
+### 📋 Planned
+- [ ] Advanced telemetry predictions (sector times, pit windows)
+- [ ] QR code league joining
+- [ ] Camera integration for profile photos
+- [ ] Analytics dashboard (hit rate, average margin)
 - [ ] Seasonal leaderboards and playoffs
 - [ ] Mobile app (React Native)
-- [ ] Country-based leaderboards
