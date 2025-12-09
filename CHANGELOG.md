@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.1.11](https://github.com/iturgut/F1Picks/compare/f1-picks-v0.1.10...f1-picks-v0.1.11) (2025-12-09)
+
+
+### Bug Fixes
+
+* improve error handling for picks fetch - treat as non-critical ([6172977](https://github.com/iturgut/F1Picks/commit/6172977e9f7fe3b4ca876fc796a9879fc7af04d2))
+
 ## [0.1.10](https://github.com/iturgut/F1Picks/compare/f1-picks-v0.1.9...f1-picks-v0.1.10) (2025-12-09)
 
 
