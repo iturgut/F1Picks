@@ -50,9 +50,13 @@ jobs:
       - name: Sync F1 data
         working-directory: ./worker
         env:
-          DATABASE_URL: ${{ secrets.DATABASE_URL }}
           FASTF1_CACHE_DIR: ./cache/fastf1
         run: |
+          # Convert DATABASE_URL to use asyncpg driver
+          DB_URL="${{ secrets.DATABASE_URL }}"
+          # Replace postgresql:// with postgresql+asyncpg://
+          export DATABASE_URL="${DB_URL/postgresql:\/\//postgresql+asyncpg:\/\/}"
+          
           # Build command with optional flags
           CMD="python ingest_all.py"
           
