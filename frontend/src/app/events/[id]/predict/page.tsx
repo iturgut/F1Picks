@@ -74,12 +74,18 @@ export default function PredictPage() {
         setLoading(true)
         const token = await getAccessToken()
         
+        if (!token) {
+          setError('Please log in to make predictions')
+          setLoading(false)
+          return
+        }
+        
         // Fetch event
-        const eventData = await fetchEvent(params.id as string, token || undefined)
+        const eventData = await fetchEvent(params.id as string, token)
         setEvent(eventData)
         
         // Fetch existing picks
-        if (token) {
+        try {
           const picksData = await fetchPicks(token, { event_id: params.id as string })
           setExistingPicks(picksData.picks)
           
@@ -89,6 +95,10 @@ export default function PredictPage() {
             existingPredictions[pick.prop_type] = pick.prop_value
           })
           setPredictions(existingPredictions)
+        } catch (pickErr) {
+          // If picks fetch fails, just log it and continue - user might not have picks yet
+          console.log('No existing picks found or error fetching picks:', pickErr)
+          setError(null) // Clear any error since this is not critical
         }
       } catch (err) {
         console.error('Error loading data:', err)
