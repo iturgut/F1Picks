@@ -288,6 +288,135 @@ export async function syncUserProfile(token: string): Promise<UserProfile> {
   }
 }
 
+// League types and functions
+export interface League {
+  id: string
+  name: string
+  description?: string
+  is_global: boolean
+  owner_id?: string
+  created_at: string
+  member_count?: number
+}
+
+export interface LeagueCreate {
+  name: string
+  description?: string
+}
+
+/**
+ * Create a new league
+ */
+export async function createLeague(token: string, data: LeagueCreate): Promise<League> {
+  const response = await fetch(`${API_BASE_URL}/api/leagues`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${token}`,
+    },
+    body: JSON.stringify(data),
+  })
+  
+  if (!response.ok) {
+    const error = await response.json().catch(() => ({ detail: response.statusText }))
+    throw new Error(error.detail || 'Failed to create league')
+  }
+  
+  return response.json()
+}
+
+/**
+ * Get all leagues for the current user
+ */
+export async function fetchUserLeagues(token: string): Promise<League[]> {
+  const response = await fetch(`${API_BASE_URL}/api/leagues`, {
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${token}`,
+    },
+  })
+  
+  if (!response.ok) {
+    const error = await response.json().catch(() => ({ detail: response.statusText }))
+    throw new Error(error.detail || 'Failed to fetch leagues')
+  }
+  
+  return response.json()
+}
+
+/**
+ * Delete a league (owner only)
+ */
+export async function deleteLeague(token: string, leagueId: string): Promise<void> {
+  const response = await fetch(`${API_BASE_URL}/api/leagues/${leagueId}`, {
+    method: 'DELETE',
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${token}`,
+    },
+  })
+  
+  if (!response.ok) {
+    const error = await response.json().catch(() => ({ detail: response.statusText }))
+    throw new Error(error.detail || 'Failed to delete league')
+  }
+}
+
+/**
+ * Kick a member from a league (owner only)
+ */
+export async function kickMember(token: string, leagueId: string, userId: string): Promise<void> {
+  const response = await fetch(`${API_BASE_URL}/api/leagues/${leagueId}/members/${userId}`, {
+    method: 'DELETE',
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${token}`,
+    },
+  })
+  
+  if (!response.ok) {
+    const error = await response.json().catch(() => ({ detail: response.statusText }))
+    throw new Error(error.detail || 'Failed to kick member')
+  }
+}
+
+/**
+ * Search for users by name or email
+ */
+export async function searchUsers(token: string, query: string): Promise<UserProfile[]> {
+  const response = await fetch(`${API_BASE_URL}/api/users/search?q=${encodeURIComponent(query)}`, {
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${token}`,
+    },
+  })
+  
+  if (!response.ok) {
+    const error = await response.json().catch(() => ({ detail: response.statusText }))
+    throw new Error(error.detail || 'Failed to search users')
+  }
+  
+  return response.json()
+}
+
+/**
+ * Invite a user to a league (owner only)
+ */
+export async function inviteUserToLeague(token: string, leagueId: string, userId: string): Promise<void> {
+  const response = await fetch(`${API_BASE_URL}/api/leagues/${leagueId}/invite/${userId}`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${token}`,
+    },
+  })
+  
+  if (!response.ok) {
+    const error = await response.json().catch(() => ({ detail: response.statusText }))
+    throw new Error(error.detail || 'Failed to invite user')
+  }
+}
+
 /**
  * Fetch results for an event
  */
