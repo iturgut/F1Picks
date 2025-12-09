@@ -1,5 +1,22 @@
 # Changelog
 
+## [0.1.12](https://github.com/iturgut/F1Picks/compare/f1-picks-v0.1.11...f1-picks-v0.1.12) (2025-12-09)
+
+
+### Bug Fixes
+
+* add psycopg2-binary to worker requirements ([a7f4e1b](https://github.com/iturgut/F1Picks/commit/a7f4e1beb55720db637b8399eeb01abde8b76f00))
+* convert DATABASE_URL to use asyncpg driver in workflow ([a2c14fb](https://github.com/iturgut/F1Picks/commit/a2c14fb9289917030bcfa210cbb6046cc4b0319a))
+* fix daily data sync workflow dependency installation ([2270ec3](https://github.com/iturgut/F1Picks/commit/2270ec3ee6ea189d1925d512fb4226b97f72f976))
+* register leagues router in main.py ([fd740a4](https://github.com/iturgut/F1Picks/commit/fd740a422236b5aeb6cc8010977cc39cd01f87b6))
+* resolve CORS policy issues for production frontend ([ffab6ae](https://github.com/iturgut/F1Picks/commit/ffab6ae5d511f086f34d51179ca91dab94f17a3b))
+* simplify CORS configuration to allow all origins ([baad715](https://github.com/iturgut/F1Picks/commit/baad7153012a64199eaf4ca7456c7833fa926c3b))
+
+
+### Documentation
+
+* update README to reflect current deployment state and implementation ([0a26895](https://github.com/iturgut/F1Picks/commit/0a268952ceb3fc4a722139eca606b6e459af96f7))
+
 ## [0.1.11](https://github.com/iturgut/F1Picks/compare/f1-picks-v0.1.10...f1-picks-v0.1.11) (2025-12-09)
 
 
