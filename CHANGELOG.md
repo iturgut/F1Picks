@@ -1,5 +1,18 @@
 # Changelog
 
+## [0.1.10](https://github.com/iturgut/F1Picks/compare/f1-picks-v0.1.9...f1-picks-v0.1.10) (2025-12-09)
+
+
+### Features
+
+* add database migration for league owner and role fields ([f21487a](https://github.com/iturgut/F1Picks/commit/f21487a92f727ecf601fddd2683dc40dfba508db))
+* implement some routing ([#89](https://github.com/iturgut/F1Picks/issues/89)) ([9f7e7d1](https://github.com/iturgut/F1Picks/commit/9f7e7d1f12dac94d5f0964c77b71abbf410b18c7))
+
+
+### Bug Fixes
+
+* add migration file content for league owner and role fields ([8efca76](https://github.com/iturgut/F1Picks/commit/8efca76df5b87282b9dc28791581db8e2cea9161))
+
 ## [0.1.9](https://github.com/iturgut/F1Picks/compare/f1-picks-v0.1.8...f1-picks-v0.1.9) (2025-12-05)
 
 
