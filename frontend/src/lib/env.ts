@@ -15,9 +15,15 @@ if (typeof window !== 'undefined') {
     'NEXT_PUBLIC_SUPABASE_ANON_KEY',
   ] as const
 
+  console.log('Environment variables check:', {
+    NEXT_PUBLIC_SUPABASE_URL: env.NEXT_PUBLIC_SUPABASE_URL ? '✓ Set' : '✗ Missing',
+    NEXT_PUBLIC_SUPABASE_ANON_KEY: env.NEXT_PUBLIC_SUPABASE_ANON_KEY ? '✓ Set' : '✗ Missing',
+    NEXT_PUBLIC_BACKEND_URL: env.NEXT_PUBLIC_BACKEND_URL ? '✓ Set' : '✗ Missing',
+  })
+
   for (const envVar of requiredEnvVars) {
     if (!env[envVar]) {
-      console.error(`Missing required environment variable: ${envVar}`)
+      console.error(`❌ Missing required environment variable: ${envVar}`)
     }
   }
 }

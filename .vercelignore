@@ -1,0 +1,20 @@
+# Ignore everything except frontend
+backend/
+worker/
+shared/
+.taskmaster/
+.github/
+node_modules/
+.git/
+
+# Keep these at root
+!package.json
+!package-lock.json
+!.gitignore
+!.vercelignore
+
+# Frontend specific ignores
+frontend/node_modules/
+frontend/.next/
+frontend/.vercel/
+frontend/out/

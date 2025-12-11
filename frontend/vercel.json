@@ -1,7 +1,7 @@
 {
-  "buildCommand": "cd .. && npm ci && npm run build --workspace=frontend",
+  "buildCommand": "npm run build",
   "outputDirectory": ".next",
-  "installCommand": "cd .. && npm ci --include=dev",
+  "installCommand": "npm install",
   "framework": "nextjs",
   "functions": {
     "app/api/**/*.js": {

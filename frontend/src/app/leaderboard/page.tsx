@@ -13,33 +13,71 @@ interface LeaderboardEntry {
   average_points: number;
 }
 
+interface League {
+  id: string;
+  name: string;
+}
+
 export default function LeaderboardPage() {
-  const { user } = useAuth();
+  const { user, getAccessToken } = useAuth();
   const [leaderboard, setLeaderboard] = useState<LeaderboardEntry[]>([]);
+  const [leagues, setLeagues] = useState<League[]>([]);
+  const [selectedLeague, setSelectedLeague] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [season, setSeason] = useState(new Date().getFullYear());
   const [timeFrame, setTimeFrame] = useState<'current' | 'season' | 'all-time'>('season');
 
   useEffect(() => {
+    if (user) {
+      fetchLeagues();
+    }
+  }, [user]);
+
+  useEffect(() => {
     fetchLeaderboard();
-  }, [season, timeFrame]);
+  }, [season, timeFrame, selectedLeague]);
+
+  const fetchLeagues = async () => {
+    try {
+      const token = await getAccessToken();
+      if (!token) return;
+
+      const response = await fetch(
+        `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/leagues`,
+        {
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`,
+          },
+        }
+      );
+
+      if (response.ok) {
+        const data = await response.json();
+        setLeagues(data);
+      }
+    } catch (err) {
+      console.error('Failed to fetch leagues:', err);
+    }
+  };
 
   const fetchLeaderboard = async () => {
     try {
       setLoading(true);
       setError(null);
 
-      // For now, we'll use season leaderboard
-      // TODO: Add support for all-time and current event leaderboards
-      const response = await fetch(
-        `${process.env.NEXT_PUBLIC_BACKEND_URL}/scores/leaderboard/season/${season}?limit=50`,
-        {
-          headers: {
-            'Content-Type': 'application/json',
-          },
-        }
-      );
+      // Build URL with optional league filter
+      let url = `${process.env.NEXT_PUBLIC_BACKEND_URL}/scores/leaderboard/season/${season}?limit=50`;
+      if (selectedLeague) {
+        url += `&league_id=${selectedLeague}`;
+      }
+
+      const response = await fetch(url, {
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      });
 
       if (!response.ok) {
         throw new Error('Failed to fetch leaderboard');
@@ -121,6 +159,27 @@ export default function LeaderboardPage() {
                 <option value={2023}>2023</option>
               </select>
             </div>
+
+            {/* League selector */}
+            {user && leagues.length > 0 && (
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  League
+                </label>
+                <select
+                  value={selectedLeague || ''}
+                  onChange={(e) => setSelectedLeague(e.target.value || null)}
+                  className="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent"
+                >
+                  <option value="">Global Leaderboard</option>
+                  {leagues.map((league) => (
+                    <option key={league.id} value={league.id}>
+                      {league.name}
+                    </option>
+                  ))}
+                </select>
+              </div>
+            )}
 
             {/* Time frame selector (for future use) */}
             <div>
@@ -242,7 +301,12 @@ export default function LeaderboardPage() {
         {/* Footer Info */}
         {leaderboard.length > 0 && (
           <div className="mt-6 text-center text-sm text-gray-500">
-            <p>Showing top {leaderboard.length} users for {season} season</p>
+            <p>
+              Showing top {leaderboard.length} users for {season} season
+              {selectedLeague && leagues.find(l => l.id === selectedLeague) && (
+                <> in <span className="font-medium text-gray-700">{leagues.find(l => l.id === selectedLeague)?.name}</span></>
+              )}
+            </p>
           </div>
         )}
       </div>
