@@ -1,6 +1,6 @@
 {
   "name": "@f1picks/backend",
-  "version": "0.1.12",
+  "version": "0.1.13",
   "description": "F1 Picks Backend API",
   "private": true,
   "scripts": {
