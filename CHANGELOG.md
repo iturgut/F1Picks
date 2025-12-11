@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.1.13](https://github.com/iturgut/F1Picks/compare/f1-picks-v0.1.12...f1-picks-v0.1.13) (2025-12-11)
+
+
+### Features
+
+* implement leagues and enhance leaderboard functionality ([e10ed86](https://github.com/iturgut/F1Picks/commit/e10ed86c2c251ffce841858dd391f6e6a28646e0))
+
 ## [0.1.12](https://github.com/iturgut/F1Picks/compare/f1-picks-v0.1.11...f1-picks-v0.1.12) (2025-12-09)
 
 
