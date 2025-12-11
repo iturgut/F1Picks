@@ -68,7 +68,7 @@ class LeagueRepository(BaseRepository[League]):
         
         Args:
             user_id: User ID
-            active_only: Only return active leagues
+            active_only: Only return active leagues (currently ignored as is_active field doesn't exist)
             
         Returns:
             List of leagues the user is a member of
@@ -79,8 +79,9 @@ class LeagueRepository(BaseRepository[League]):
             .where(LeagueMember.user_id == user_id)
         )
 
-        if active_only:
-            query = query.where(League.is_active == True)
+        # Note: is_active field doesn't exist in current schema
+        # if active_only:
+        #     query = query.where(League.is_active == True)
 
         query = query.order_by(League.created_at.desc())
 
@@ -98,10 +99,11 @@ class LeagueRepository(BaseRepository[League]):
         Returns:
             List of public leagues
         """
+        # Note: is_public and is_active fields don't exist in current schema
         return await self.get_all(
             skip=skip,
             limit=limit,
-            filters={"is_public": True, "is_active": True},
+            filters={"is_global": False},  # Get non-global leagues
             order_by="-created_at"
         )
 

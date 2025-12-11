@@ -17,6 +17,13 @@ import { env } from '@/lib/env'
  * @returns Supabase client instance
  */
 export function createClient() {
+  if (typeof window !== 'undefined') {
+    console.log('🔧 Creating Supabase client with:', {
+      url: env.NEXT_PUBLIC_SUPABASE_URL ? 'Set' : 'Missing',
+      key: env.NEXT_PUBLIC_SUPABASE_ANON_KEY ? 'Set' : 'Missing'
+    })
+  }
+  
   return createBrowserClient(
     env.NEXT_PUBLIC_SUPABASE_URL,
     env.NEXT_PUBLIC_SUPABASE_ANON_KEY

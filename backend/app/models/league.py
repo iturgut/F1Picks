@@ -16,11 +16,13 @@ class League(Base):
     name = Column(String(100), nullable=False)
     description = Column(Text, nullable=True)
     is_global = Column(Boolean, default=False, nullable=False, index=True)
+    owner_id = Column(UUID(as_uuid=True), ForeignKey("users.id", ondelete="CASCADE"), nullable=True)
     created_at = Column(DateTime(timezone=True), server_default=func.now(), nullable=False)
     updated_at = Column(DateTime(timezone=True), server_default=func.now(), onupdate=func.now(), nullable=False)
 
     # Relationships
     members = relationship("LeagueMember", back_populates="league", cascade="all, delete-orphan")
+    owner = relationship("User", foreign_keys=[owner_id])
 
     def __repr__(self) -> str:
         return f"<League(id={self.id}, name='{self.name}', is_global={self.is_global})>"
@@ -33,6 +35,7 @@ class LeagueMember(Base):
     id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
     user_id = Column(UUID(as_uuid=True), ForeignKey("users.id", ondelete="CASCADE"), nullable=False)
     league_id = Column(UUID(as_uuid=True), ForeignKey("leagues.id", ondelete="CASCADE"), nullable=False)
+    role = Column(String(20), default="member", nullable=False)
     joined_at = Column(DateTime(timezone=True), server_default=func.now(), nullable=False)
 
     # Relationships
@@ -40,4 +43,4 @@ class LeagueMember(Base):
     league = relationship("League", back_populates="members")
 
     def __repr__(self) -> str:
-        return f"<LeagueMember(user_id={self.user_id}, league_id={self.league_id})>"
+        return f"<LeagueMember(user_id={self.user_id}, league_id={self.league_id}, role={self.role})>"

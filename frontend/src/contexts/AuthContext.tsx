@@ -28,30 +28,54 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined)
 export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<User | null>(null)
   const [loading, setLoading] = useState(true)
-  const supabase = createClient()
+  const [supabase] = useState(() => createClient())
 
   useEffect(() => {
-    // Get initial session
-    supabase.auth.getSession().then(async ({ data: { session } }) => {
-      setUser(session?.user ?? null)
-      
-      // Sync user profile with backend if authenticated (client-side only)
-      if (session?.access_token && typeof window !== 'undefined') {
-        try {
-          const { syncUserProfile } = await import('@/lib/api')
-          await syncUserProfile(session.access_token)
-        } catch (error) {
-          console.error('Failed to sync user profile:', error)
-        }
-      }
-      
+    console.log('🚀 AuthProvider initializing...')
+    
+    // Set a timeout to prevent infinite loading
+    const timeout = setTimeout(() => {
+      console.warn('⏱️ Auth initialization timeout - setting loading to false')
       setLoading(false)
-    })
+    }, 5000) // 5 second timeout
+
+    // Get initial session
+    supabase.auth.getSession()
+      .then(async ({ data: { session }, error }) => {
+        console.log('📡 Session check complete:', { 
+          hasSession: !!session, 
+          hasError: !!error,
+          user: session?.user?.email 
+        })
+        
+        if (error) {
+          console.error('❌ Error getting session:', error)
+        }
+        setUser(session?.user ?? null)
+        clearTimeout(timeout)
+        setLoading(false)
+        
+        // Sync user profile with backend if authenticated (non-blocking, client-side only)
+        if (session?.access_token && typeof window !== 'undefined') {
+          try {
+            const { syncUserProfile } = await import('@/lib/api')
+            await syncUserProfile(session.access_token)
+          } catch (error) {
+            console.error('Failed to sync user profile:', error)
+          }
+        }
+      })
+      .catch((error) => {
+        console.error('💥 Fatal error in auth initialization:', error)
+        clearTimeout(timeout)
+        setLoading(false)
+      })
 
     // Listen for auth changes
     const {
       data: { subscription },
     } = supabase.auth.onAuthStateChange(async (_event, session) => {
+      console.log('🔄 Auth state changed:', _event)
       setUser(session?.user ?? null)
       
       // Sync user profile with backend if authenticated (client-side only)
@@ -63,12 +87,14 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           console.error('Failed to sync user profile:', error)
         }
       }
-      
-      setLoading(false)
     })
 
-    return () => subscription.unsubscribe()
-  }, [supabase.auth])
+    return () => {
+      console.log('🧹 AuthProvider cleanup')
+      clearTimeout(timeout)
+      subscription.unsubscribe()
+    }
+  }, [])
 
   const getAccessToken = async (): Promise<string | null> => {
     const { data: { session } } = await supabase.auth.getSession()
