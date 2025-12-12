@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.1.14](https://github.com/iturgut/F1Picks/compare/f1-picks-v0.1.13...f1-picks-v0.1.14) (2025-12-12)
+
+
+### Bug Fixes
+
+* include user names in league members endpoint ([#95](https://github.com/iturgut/F1Picks/issues/95)) ([f47a2ef](https://github.com/iturgut/F1Picks/commit/f47a2efc40bb862adcf671ee713c91e88feb0111))
+
 ## [0.1.13](https://github.com/iturgut/F1Picks/compare/f1-picks-v0.1.12...f1-picks-v0.1.13) (2025-12-11)
 
 
