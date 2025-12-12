@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.1.15](https://github.com/iturgut/F1Picks/compare/f1-picks-v0.1.14...f1-picks-v0.1.15) (2025-12-12)
+
+
+### Bug Fixes
+
+* improve text contrast in prediction dropdown options ([4fa3ace](https://github.com/iturgut/F1Picks/commit/4fa3aced379ae3127acd7ef7785b9dee4e2e989f))
+
 ## [0.1.14](https://github.com/iturgut/F1Picks/compare/f1-picks-v0.1.13...f1-picks-v0.1.14) (2025-12-12)
 
 
