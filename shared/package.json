@@ -1,6 +1,6 @@
 {
   "name": "@f1picks/shared",
-  "version": "0.1.14",
+  "version": "0.1.15",
   "description": "Shared utilities and types for F1 Picks",
   "main": "index.js",
   "types": "index.d.ts",
