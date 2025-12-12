@@ -244,11 +244,11 @@ export default function PredictPage() {
                 <select
                   value={predictions[propType.value] || ''}
                   onChange={(e) => setPredictions({ ...predictions, [propType.value]: e.target.value })}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-900 bg-white"
                 >
-                  <option value="">Select a driver</option>
+                  <option value="" className="text-gray-500">Select a driver</option>
                   {DRIVERS.map((driver) => (
-                    <option key={driver} value={driver}>
+                    <option key={driver} value={driver} className="text-gray-900">
                       {driver}
                     </option>
                   ))}
