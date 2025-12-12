@@ -40,6 +40,11 @@ export interface Pick {
   updated_at: string
 }
 
+export interface PickWithUser extends Pick {
+  user_name: string
+  user_email: string
+}
+
 export interface Result {
   id: string
   event_id: string
@@ -244,6 +249,30 @@ export async function deletePick(token: string, pickId: string): Promise<void> {
     const error = await response.json().catch(() => ({ detail: response.statusText }))
     throw new Error(error.detail || 'Failed to delete pick')
   }
+}
+
+/**
+ * Fetch picks for an event from league members
+ */
+export async function fetchEventLeaguePicks(
+  token: string,
+  eventId: string
+): Promise<PickWithUser[]> {
+  const response = await fetch(
+    `${API_BASE_URL}/picks/events/${eventId}/league-picks`,
+    {
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}`,
+      },
+    }
+  )
+  
+  if (!response.ok) {
+    throw new Error(`Failed to fetch event league picks: ${response.statusText}`)
+  }
+  
+  return response.json()
 }
 
 /**

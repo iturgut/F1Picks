@@ -50,6 +50,23 @@ class PickResponse(BaseModel):
         from_attributes = True
 
 
+class PickWithUserResponse(BaseModel):
+    """Pick response with user information."""
+    id: UUID
+    user_id: UUID
+    user_name: str
+    user_email: str
+    event_id: UUID
+    prop_type: str
+    prop_value: str
+    prop_metadata: Optional[dict]
+    created_at: datetime
+    updated_at: datetime
+    
+    class Config:
+        from_attributes = True
+
+
 class PickListResponse(BaseModel):
     """Paginated pick list response."""
     picks: List[PickResponse]
@@ -350,3 +367,81 @@ async def delete_pick(
     await db.commit()
     
     return None
+
+
+@router.get("/events/{event_id}/league-picks", response_model=List[PickWithUserResponse])
+async def get_event_league_picks(
+    event_id: UUID,
+    db: AsyncSession = Depends(get_db),
+    current_user: User = Depends(get_current_user),
+):
+    """
+    Get all picks for an event from users in the same leagues as the current user.
+    
+    This endpoint returns picks from:
+    - The current user
+    - All users who share at least one league with the current user
+    
+    Useful for displaying predictions on the event detail page.
+    """
+    from ..models.league import LeagueMember
+    
+    # Get all leagues the current user is a member of
+    leagues_query = select(LeagueMember.league_id).where(
+        LeagueMember.user_id == current_user.id
+    )
+    leagues_result = await db.execute(leagues_query)
+    user_league_ids = [row[0] for row in leagues_result.all()]
+    
+    if not user_league_ids:
+        # User is not in any leagues, return only their own picks
+        query = select(Pick).join(User).where(
+            and_(
+                Pick.event_id == event_id,
+                Pick.user_id == current_user.id
+            )
+        )
+    else:
+        # Get all users in the same leagues
+        league_members_query = select(LeagueMember.user_id).where(
+            LeagueMember.league_id.in_(user_league_ids)
+        ).distinct()
+        league_members_result = await db.execute(league_members_query)
+        league_member_ids = [row[0] for row in league_members_result.all()]
+        
+        # Get picks from all league members for this event
+        query = select(Pick).join(User).where(
+            and_(
+                Pick.event_id == event_id,
+                Pick.user_id.in_(league_member_ids)
+            )
+        )
+    
+    # Order by user name, then prop type
+    query = query.order_by(User.name, Pick.prop_type)
+    
+    result = await db.execute(query)
+    picks = result.scalars().all()
+    
+    # Fetch user data for each pick
+    pick_responses = []
+    for pick in picks:
+        user_query = select(User).where(User.id == pick.user_id)
+        user_result = await db.execute(user_query)
+        user = user_result.scalar_one_or_none()
+        
+        if user:
+            pick_responses.append(PickWithUserResponse(
+                id=pick.id,
+                user_id=pick.user_id,
+                user_name=user.name,
+                user_email=user.email,
+                event_id=pick.event_id,
+                prop_type=pick.prop_type.value,
+                prop_value=pick.prop_value,
+                prop_metadata=pick.prop_metadata,
+                created_at=pick.created_at,
+                updated_at=pick.updated_at,
+            ))
+    
+    return pick_responses

@@ -56,6 +56,8 @@ class LeagueMemberResponse(BaseModel):
     league_id: UUID
     role: str
     joined_at: datetime
+    user_name: Optional[str] = None
+    user_email: Optional[str] = None
 
     class Config:
         from_attributes = True
@@ -447,7 +449,7 @@ async def invite_user_to_league(
     await db.commit()
 
 
-@router.get("/{league_id}/members", response_model=List[UserProfileResponse])
+@router.get("/{league_id}/members", response_model=List[LeagueMemberResponse])
 async def get_league_members(
     league_id: UUID,
     current_user: User = Depends(get_current_user),
@@ -475,13 +477,16 @@ async def get_league_members(
             detail="You are not a member of this league"
         )
     
-    # Return user profiles
+    # Return league members with user details
     return [
-        UserProfileResponse(
-            id=member.user.id,
-            email=member.user.email,
-            name=member.user.name,
-            photo_url=member.user.photo_url
+        LeagueMemberResponse(
+            id=member.id,
+            user_id=member.user_id,
+            league_id=member.league_id,
+            role=member.role,
+            joined_at=member.joined_at,
+            user_name=member.user.name,
+            user_email=member.user.email
         )
         for member in league.members
     ]
