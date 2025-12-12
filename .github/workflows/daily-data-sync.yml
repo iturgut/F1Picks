@@ -11,7 +11,7 @@ on:
       year:
         description: 'Season year to ingest'
         required: false
-        default: '2025'
+        default: '2026'
         type: string
       skip_schedule:
         description: 'Skip schedule ingestion'
@@ -60,11 +60,11 @@ jobs:
           # Build command with optional flags
           CMD="python ingest_all.py"
           
-          # Add year (use input if manual trigger, otherwise current year)
+          # Add year (use input if manual trigger, otherwise 2026)
           if [ -n "${{ github.event.inputs.year }}" ]; then
             CMD="$CMD --year ${{ github.event.inputs.year }}"
           else
-            CMD="$CMD --year 2025"
+            CMD="$CMD --year 2026"
           fi
           
           # Add flags based on manual inputs
